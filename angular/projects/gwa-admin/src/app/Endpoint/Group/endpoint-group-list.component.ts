@@ -12,17 +12,17 @@ import {Group} from '../../Group/Group';
 @Component({
   selector: 'admin-endpoint-group-list',
   template: `
-  <mat-table #table [dataSource]="dataSource" >
+  <table mat-table  #table [dataSource]="dataSource" >
 
     <ng-container matColumnDef="group">
-      <mat-header-cell *matHeaderCellDef>Group</mat-header-cell>
-      <mat-cell *matCellDef="let record">
-        <a [routerLink]="['/ui','endpoints', api.name, 'groups', record.group]">{{record.group}}</a></mat-cell>
+      <th mat-header-cell *matHeaderCellDef>Group</th>
+      <td mat-cell *matCellDef="let record">
+        <a [routerLink]="['/ui','endpoints', api.name, 'groups', record.group]">{{record.group}}</a></td>
     </ng-container>
 
-    <mat-header-row *matHeaderRowDef="columnNames"></mat-header-row>
-    <mat-row *matRowDef="let row; columns: columnNames"></mat-row>
-  </mat-table>
+    <tr mat-header-row *matHeaderRowDef="columnNames"></tr>
+    <tr mat-row *matRowDef="let row; columns: columnNames"></tr>
+  </table> 
   <mat-paginator
     #paginator
     [length]="recordCount | async"

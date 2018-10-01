@@ -141,14 +141,8 @@ public class ApiService implements ServletContextListener, GwaConstants {
     }
   }
 
-  public void addGitHubDeveloperGroup(final String username) throws IOException {
-    try (
-      JsonHttpClient httpClient = newKongClient()) {
-      final Map<String, Object> aclRequest = Collections.singletonMap(GROUP,
-        GitHubPrincipal.DEVELOPER_ROLE);
-      final String aclPath = ApiService.CONSUMERS_PATH2 + username + ApiService.ACLS_PATH;
-      httpClient.post(aclPath, aclRequest);
-    }
+  public void addGitHubDeveloperGroup(final BasePrincipal userPrincipal) throws IOException {
+    addUserToGroup(userPrincipal, GitHubPrincipal.DEVELOPER_ROLE);
   }
 
   @SuppressWarnings("unchecked")
@@ -160,6 +154,20 @@ public class ApiService implements ServletContextListener, GwaConstants {
       final Object fieldValue = config.get(fieldName);
       if (fieldValue != null) {
         limits.put(fieldName, fieldValue);
+      }
+    }
+  }
+
+  public void addUserToGroup(final BasePrincipal userPrincipal, final String groupName)
+    throws IOException {
+    try (
+      JsonHttpClient httpClient = newKongClient()) {
+      final Set<String> groups = userGroups(httpClient, userPrincipal);
+      if (!groups.contains(groupName)) {
+        final Map<String, Object> aclRequest = Collections.singletonMap(GROUP, groupName);
+        final String userName = userPrincipal.getName();
+        final String aclPath = ApiService.CONSUMERS_PATH2 + userName + ApiService.ACLS_PATH;
+        httpClient.post(aclPath, aclRequest);
       }
     }
   }
@@ -404,7 +412,7 @@ public class ApiService implements ServletContextListener, GwaConstants {
               }
             }
           }
-          urlString = (String)kongResponse.get(NEXT);
+          urlString = getNextUrl(kongResponse);
         } while (urlString != null);
       } catch (final NoSuchElementException e) {
       }
@@ -602,7 +610,8 @@ public class ApiService implements ServletContextListener, GwaConstants {
     final HttpServletResponse httpResponse) {
     handleRequest(httpResponse, httpClient -> {
 
-      final Set<String> groups = userGroups(httpRequest, httpClient);
+      final BasePrincipal userPrincipal = (BasePrincipal)httpRequest.getUserPrincipal();
+      final Set<String> groups = userGroups(httpClient, userPrincipal);
 
       final Map<String, Map<String, Object>> apiByName = new TreeMap<>();
 
@@ -873,7 +882,7 @@ public class ApiService implements ServletContextListener, GwaConstants {
 
           }
 
-          urlString = (String)pageKongResponse.get(NEXT);
+          urlString = getNextUrl(pageKongResponse);
         } while (urlString != null);
       } catch (final NoSuchElementException e) {
       }
@@ -1108,6 +1117,14 @@ public class ApiService implements ServletContextListener, GwaConstants {
     return data;
   }
 
+  private String getNextUrl(final Map<String, Object> kongResponse) {
+    String urlString = (String)kongResponse.remove(NEXT);
+    if (urlString != null && !urlString.startsWith("http")) {
+      urlString = this.kongAdminUrl + urlString;
+    }
+    return urlString;
+  }
+
   private synchronized Map<String, Map<String, Object>> getObjectById(final String type) {
     Map<String, Map<String, Object>> objectById = this.objectByTypeAndId.get(type);
     if (objectById == null) {
@@ -1175,8 +1192,8 @@ public class ApiService implements ServletContextListener, GwaConstants {
         final String path = "/orgs/" + this.gitHubOrganizationName + "/memberships/" + username
           + "?access_token=" + this.gitHubAccessToken;
         client.put(path);
+        addGitHubDeveloperGroup(gitHubPrincipal);
         gitHubPrincipal.addDeveloperRole();
-        addGitHubDeveloperGroup(username);
       }
     }
   }
@@ -1349,7 +1366,7 @@ public class ApiService implements ServletContextListener, GwaConstants {
     Map<String, Object> kongResponse;
     do {
       kongResponse = httpClient.getByUrl(urlString);
-      urlString = (String)kongResponse.remove(NEXT);
+      urlString = getNextUrl(kongResponse);
     } while (urlString != null && offsetPage-- > 0);
     return kongResponse;
   }
@@ -1374,7 +1391,7 @@ public class ApiService implements ServletContextListener, GwaConstants {
           action.accept(row);
 
         }
-        urlString = (String)kongResponse.get(NEXT);
+        urlString = getNextUrl(kongResponse);
       } while (urlString != null);
     } catch (final NoSuchElementException e) {
     }
@@ -1410,7 +1427,7 @@ public class ApiService implements ServletContextListener, GwaConstants {
       for (final Map<String, Object> row : rows) {
         action.accept(row);
       }
-      urlString = (String)kongResponse.get(NEXT);
+      urlString = getNextUrl(kongResponse);
     } while (urlString != null);
   }
 
@@ -1559,61 +1576,68 @@ public class ApiService implements ServletContextListener, GwaConstants {
     return username;
   }
 
-  private Set<String> userGroups(final HttpServletRequest httpRequest,
-    final JsonHttpClient httpClient) throws IOException {
-    final String username = httpRequest.getRemoteUser();
-    final Set<String> groups = new HashSet<>();
-    final String path = CONSUMERS_PATH2 + username + ACLS_PATH;
-    kongPageAll(httpRequest, httpClient, path, acl -> {
-      final String groupName = (String)acl.get(GROUP);
-      groups.add(groupName);
-    });
-    return groups;
+  public Set<String> userGroups(final JsonHttpClient httpClient, final BasePrincipal userPrincipal)
+    throws IOException {
+    final String customId = userPrincipal.getId();
+    final String username = userPrincipal.getName();
+    return userGroups(httpClient, customId, username);
+  }
+
+  public Set<String> userGroups(final JsonHttpClient httpClient, final String customId,
+    final String username) throws IOException {
+    final Set<String> roles = new TreeSet<>();
+    Map<String, Object> consumer;
+    if (customId == null) {
+      consumer = Collections.emptyMap();
+    } else {
+      final String customIdFilter = "/consumers/?custom_id=" + customId;
+      consumer = userGet(httpClient, customIdFilter);
+    }
+    if (consumer.isEmpty()) {
+      final String usernameFilter = "/consumers/?username=" + username;
+      consumer = userGet(httpClient, usernameFilter);
+    } else {
+      // Update if username changed
+      if (!username.equals(consumer.get(USERNAME))) {
+        final String id = (String)consumer.get(ID);
+        consumer.put(USERNAME, username);
+        httpClient.patch(CONSUMERS_PATH2 + id, consumer);
+      }
+    }
+    if (consumer.isEmpty()) {
+      // Create if consumer doesn't exist
+      consumer = new HashMap<>();
+      if (customId != null) {
+        consumer.put(CUSTOM_ID, customId);
+      }
+      consumer.put(USERNAME, username);
+      consumer = httpClient.put(CONSUMERS_PATH, consumer);
+    } else {
+      // Update if custom_id changed
+      if (customId != null && !customId.equals(consumer.get(CUSTOM_ID))) {
+        final String id = (String)consumer.get(ID);
+        consumer.put(CUSTOM_ID, customId);
+        httpClient.patch(CONSUMERS_PATH2 + id, consumer);
+      }
+    }
+    final String id = (String)consumer.get(ID);
+
+    this.usernameByConsumerId.put(id, username);
+    final String groupsPath = CONSUMERS_PATH2 + id + ACLS_PATH;
+    final Map<String, Object> groupsResponse = httpClient.get(groupsPath);
+    final List<Map<String, Object>> groupList = getList(groupsResponse, DATA);
+    for (final Map<String, Object> groupRecord : groupList) {
+      final String group = (String)groupRecord.get(GROUP);
+      roles.add(group);
+    }
+    return roles;
   }
 
   public Set<String> userGroups(final String customId, final String username) throws IOException {
-    final Set<String> roles = new TreeSet<>();
     try (
       JsonHttpClient httpClient = newKongClient()) {
-      final String customIdFilter = "/consumers/?custom_id=" + customId;
-      Map<String, Object> consumer = userGet(httpClient, customIdFilter);
-      if (consumer.isEmpty()) {
-        final String usernameFilter = "/consumers/?username=" + username;
-        consumer = userGet(httpClient, usernameFilter);
-      } else {
-        // Update if username changed
-        if (!username.equals(consumer.get(USERNAME))) {
-          final String id = (String)consumer.get(ID);
-          consumer.put(USERNAME, username);
-          httpClient.patch(CONSUMERS_PATH2 + id, consumer);
-        }
-      }
-      if (consumer.isEmpty()) {
-        // Create if consumer doesn't exist
-        consumer = new HashMap<>();
-        consumer.put(CUSTOM_ID, customId);
-        consumer.put(USERNAME, username);
-        consumer = httpClient.put(CONSUMERS_PATH, consumer);
-      } else {
-        // Update if custom_id changed
-        if (!customId.equals(consumer.get(CUSTOM_ID))) {
-          final String id = (String)consumer.get(ID);
-          consumer.put(CUSTOM_ID, customId);
-          httpClient.patch(CONSUMERS_PATH2 + id, consumer);
-        }
-      }
-      final String id = (String)consumer.get(ID);
-
-      this.usernameByConsumerId.put(id, username);
-      final String groupsPath = CONSUMERS_PATH2 + id + ACLS_PATH;
-      final Map<String, Object> groupsResponse = httpClient.get(groupsPath);
-      final List<Map<String, Object>> groupList = getList(groupsResponse, DATA);
-      for (final Map<String, Object> groupRecord : groupList) {
-        final String group = (String)groupRecord.get(GROUP);
-        roles.add(group);
-      }
+      return userGroups(httpClient, customId, username);
     }
-    return roles;
   }
 
   public void writeInserted(final HttpServletResponse httpResponse, final String id)

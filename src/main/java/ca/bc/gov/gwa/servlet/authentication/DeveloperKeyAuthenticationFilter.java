@@ -141,11 +141,12 @@ public class DeveloperKeyAuthenticationFilter extends AbstractFilter {
 
             } else {
               addGitHubGroups(client, accessToken, groups);
+              final Set<String> kongGroups = this.apiService.userGroups(userId, username);
               final GitHubPrincipal principal = new GitHubPrincipal(userId, login, username,
                 groups);
               if (groups.contains(this.apiService.getGitHubOrganizationRole())) {
-                if (!groups.contains("gwa_github_developer")) {
-                  this.apiService.addGitHubDeveloperGroup(username);
+                if (!kongGroups.contains(GitHubPrincipal.DEVELOPER_ROLE)) {
+                  this.apiService.addGitHubDeveloperGroup(principal);
                 }
                 principal.addDeveloperRole();
               }

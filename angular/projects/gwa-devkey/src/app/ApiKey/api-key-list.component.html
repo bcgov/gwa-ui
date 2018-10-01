@@ -12,8 +12,8 @@
         <mat-select placeholder="API Key" [(ngModel)]="apiKey" style="width: 290px" [disabled]="!hasApiKey">
           <mat-option *ngFor="let apiKey of rows" [value]="apiKey">{{apiKey.key}}</mat-option>
         </mat-select>
-        <button (click)="deleteApiKey()" mat-mini-fab color="warn" title="Delete API Key" [disabled]="!hasApiKey"><mat-icon fontSet="fa" fontIcon="fa-trash-o"></mat-icon></button>
-        <button (click)="addApiKey()" mat-mini-fab title="Create API Key" color="primary"><mat-icon fontSet="fa" fontIcon="fa-plus"></mat-icon></button>
+        <button (click)="deleteApiKey()" mat-mini-fab color="warn" title="Delete API Key" [disabled]="!hasApiKey"><mat-icon>delete</mat-icon></button>
+        <button (click)="addApiKey()" mat-mini-fab title="Create API Key" color="primary"><mat-icon>add_circle</mat-icon></button>
       </mat-card-content>
       <mat-card-actions>
         <button (click)="authorizeAccess()" mat-raised-button color="primary" [disabled]="!hasApiKey">Authorize application {{appName}}</button>
@@ -22,35 +22,35 @@
     <ng-template #elseUserMode>
       <div class="rowToColumn">
         <mat-card>
-          <mat-card-title>Developer API Key <a href="https://github.com/bcgov/gwa/wiki/Developer-Guide" alt="Developer Guide" target="_blank"><mat-icon fontSet="fa" fontIcon="fa-question-circle" ></mat-icon></a></mat-card-title>
+          <mat-card-title>Developer API Key <a href="https://github.com/bcgov/gwa/wiki/Developer-Guide" alt="Developer Guide" target="_blank"><mat-icon>help</mat-icon></a></mat-card-title>
           <mat-card-content>
             <div class="table-container">
               <mat-toolbar>
                 <button (click)="addApiKey()" mat-raised-button color="primary">Create API Key</button>
               </mat-toolbar>
          
-              <mat-table *ngIf="dataSource.data.length; else noUserApikeys" #table [dataSource]="dataSource">
+              <table mat-table  *ngIf="dataSource.data.length; else noUserApikeys" #table [dataSource]="dataSource">
                 <ng-container cdkColumnDef="key">
-                  <mat-header-cell *cdkHeaderCellDef>API Key</mat-header-cell>
-                  <mat-cell *cdkCellDef="let record">{{record.key}}</mat-cell>
+                  <th mat-header-cell *cdkHeaderCellDef>API Key</th>
+                  <td mat-cell *cdkCellDef="let record">{{record.key}}</td>
                 </ng-container>
 
                 <ng-container cdkColumnDef="ageDays">
-                  <mat-header-cell *cdkHeaderCellDef>Age (Days)</mat-header-cell>
-                  <mat-cell *cdkCellDef="let record">{{apiKeyAgeDays(record)}}</mat-cell>
+                  <th mat-header-cell *cdkHeaderCellDef>Age (Days)</th>
+                  <td mat-cell *cdkCellDef="let record">{{apiKeyAgeDays(record)}}</td>
                 </ng-container>
 
                 <ng-container cdkColumnDef="actions">
-                  <mat-header-cell *cdkHeaderCellDef>Actions</mat-header-cell>
-                  <mat-cell *cdkCellDef="let record"><button (click)="deleteObject(record)" mat-icon-button style="color: red" title="Delete">
-                    <mat-icon fontSet="fa" fontIcon="fa-trash-o"></mat-icon>
-                  </button></mat-cell>
+                  <th mat-header-cell *cdkHeaderCellDef>Actions</th>
+                  <td mat-cell *cdkCellDef="let record"><button (click)="deleteObject(record)" mat-icon-button style="color: red" title="Delete">
+                    <mat-icon>delete</mat-icon>
+                  </button></td>
                 </ng-container>
                 
-                <mat-header-row *cdkHeaderRowDef="columnNames"></mat-header-row>
+                <tr mat-header-row *cdkHeaderRowDef="columnNames"></tr>
                 
-                <mat-row *cdkRowDef="let row; columns: columnNames" [ngClass]="{expiring:apiKeyAgeDays(row) > row.maxAgeDays}"></mat-row>
-              </mat-table>
+                <tr mat-row *cdkRowDef="let row; columns: columnNames" [ngClass]="{expiring:apiKeyAgeDays(row) > row.maxAgeDays}"></tr>
+              </table> 
               <ng-template #noUserApikeys><div style="padding: 0.5em 1em"><i>No API keys found</i></div></ng-template>
             </div>
             <p>Use of the API keys is subject to the the <a href="/terms" target="_blank">API Key Terms of Use</a>.</p>
@@ -62,7 +62,7 @@
   </ng-container>
   <ng-template #elseAcceptTerms>
     <mat-card>
-      <mat-card-title>Developer API Key <a href="https://github.com/bcgov/gwa/wiki/Developer-Guide" alt="Developer Guide" target="_blank"><mat-icon fontSet="fa" fontIcon="fa-question-circle" ></mat-icon></a></mat-card-title>
+      <mat-card-title>Developer API Key <a href="https://github.com/bcgov/gwa/wiki/Developer-Guide" alt="Developer Guide" target="_blank"><mat-icon>help</mat-icon></a></mat-card-title>
       <mat-card-content>
         <mat-checkbox [(ngModel)]="acceptTerms">I agree to the <a href="/terms" target="_blank">API Key Terms of Use</a></mat-checkbox>
       </mat-card-content>

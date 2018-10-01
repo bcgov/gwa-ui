@@ -12,7 +12,6 @@ import {
   MatCardModule,
   MatDialogModule,
   MatIconModule,
-  MatIconRegistry,
   MatProgressSpinnerModule,
   MatSelectModule,
   MatTableModule,
@@ -94,8 +93,5 @@ import {DevKeySecurityService} from './devkey-security.service';
   bootstrap: [DevKeyComponent]
 })
 export class DevKeyModule {
-  constructor(mdIconRegistry: MatIconRegistry) {
-    mdIconRegistry.registerFontClassAlias('fa', 'fa');
-  }
 }
 

@@ -13,35 +13,35 @@ import {MatTableDataSource} from '@angular/material';
   template: `
     <h2>Server Status</h2>
 
-    <mat-table #serverTable [dataSource]="serverDataSource" >
+    <table mat-table  #serverTable [dataSource]="serverDataSource" >
       <ng-container matColumnDef="name">
-        <mat-header-cell *matHeaderCellDef>Name</mat-header-cell>
-        <mat-cell *matCellDef="let record">{{record.name}}</mat-cell>
+        <th mat-header-cell *matHeaderCellDef>Name</th>
+        <td mat-cell *matCellDef="let record">{{record.name}}</td>
       </ng-container>
       <ng-container matColumnDef="text">
-        <mat-header-cell *matHeaderCellDef>Value</mat-header-cell>
-        <mat-cell *matCellDef="let record">{{record.text}}</mat-cell>
+        <th mat-header-cell *matHeaderCellDef>Value</th>
+        <td mat-cell *matCellDef="let record">{{record.text}}</td>
       </ng-container>
 
-      <mat-header-row *matHeaderRowDef="columnNames"></mat-header-row>
-      <mat-row *matRowDef="let row; columns: columnNames"></mat-row>
-    </mat-table>
+      <tr mat-header-row *matHeaderRowDef="columnNames"></tr>
+      <tr mat-row *matRowDef="let row; columns: columnNames"></tr>
+    </table> 
 
     <h2>Database Status</h2>
 
-    <mat-table #databaseTable [dataSource]="databaseDataSource" >
+    <table mat-table  #databaseTable [dataSource]="databaseDataSource" >
       <ng-container matColumnDef="name">
-        <mat-header-cell *matHeaderCellDef>Name</mat-header-cell>
-        <mat-cell *matCellDef="let record">{{record.name}}</mat-cell>
+        <th mat-header-cell *matHeaderCellDef>Name</th>
+        <td mat-cell *matCellDef="let record">{{record.name}}</td>
       </ng-container>
       <ng-container matColumnDef="text">
-        <mat-header-cell *matHeaderCellDef>Value</mat-header-cell>
-        <mat-cell *matCellDef="let record">{{record.text}}</mat-cell>
+        <th mat-header-cell *matHeaderCellDef>Value</th>
+        <td mat-cell *matCellDef="let record">{{record.text}}</td>
       </ng-container>
 
-      <mat-header-row *matHeaderRowDef="columnNames"></mat-header-row>
-      <mat-row *matRowDef="let row; columns: columnNames"></mat-row>
-    </mat-table>
+      <tr mat-header-row *matHeaderRowDef="columnNames"></tr>
+      <tr mat-row *matRowDef="let row; columns: columnNames"></tr>
+    </table> 
   `
 })
 export class StatusViewComponent extends BaseDetailComponent<any> implements OnInit {

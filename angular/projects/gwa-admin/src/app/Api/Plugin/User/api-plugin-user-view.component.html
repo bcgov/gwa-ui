@@ -28,7 +28,7 @@
                   <label >{{formField.title}}:</label>
                   <button (click)="formField.formArrayAdd()"
                     mat-icon-button style="color: green; margin: -8px 0px -8px 0px">
-                    <mat-icon fontSet="fa" fontIcon="fa-plus-circle" alt="Add" aria-label="Add"></mat-icon>
+                    <mat-icon>add_circle</mat-icon>
                   </button>
                 </div>
                 <mat-form-field class="flexField" *ngFor="let control of formField.formArray.controls; index as i">
@@ -36,7 +36,7 @@
                   <button matSuffix
                     (click)="formField.formArrayRemove(i)"
                     mat-icon-button style="color: red">
-                    <mat-icon fontSet="fa" fontIcon="fa-trash-o"></mat-icon>
+                    <mat-icon>delete</mat-icon>
                   </button>
                 </mat-form-field>
               </div>
