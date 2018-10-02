@@ -1541,7 +1541,7 @@ public class ApiService implements ServletContextListener, GwaConstants {
       if (createMissing) {
         Map<String, Object> consumer = new HashMap<>();
         consumer.put(CUSTOM_ID, customId);
-        consumer = httpClient.put(CONSUMERS_PATH, consumer);
+        consumer = httpClient.post(CONSUMERS_PATH, consumer);
         return consumer;
       } else {
         return new LinkedHashMap<>();
@@ -1562,7 +1562,7 @@ public class ApiService implements ServletContextListener, GwaConstants {
         if (createMissing) {
           Map<String, Object> consumer = new HashMap<>();
           consumer.put(USERNAME, username);
-          consumer = httpClient.put(CONSUMERS_PATH, consumer);
+          consumer = httpClient.post(CONSUMERS_PATH, consumer);
           return consumer;
         } else {
           return new LinkedHashMap<>();
@@ -1624,7 +1624,7 @@ public class ApiService implements ServletContextListener, GwaConstants {
         consumer.put(CUSTOM_ID, customId);
       }
       consumer.put(USERNAME, username);
-      consumer = httpClient.put(CONSUMERS_PATH, consumer);
+      consumer = httpClient.post(CONSUMERS_PATH, consumer);
     } else {
       // Update if custom_id changed
       if (customId != null && !customId.equals(consumer.get(CUSTOM_ID))) {
