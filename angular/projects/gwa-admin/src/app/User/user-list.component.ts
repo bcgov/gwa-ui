@@ -28,7 +28,7 @@ export class UserListComponent extends BaseListComponent<User> {
     super(injector, service, 'Users - Gateway Admin');
     this.columnNames = ['id', 'username', 'custom_id', 'created_at', 'actions'];
     this.filterFields = [
-      {prop: 'username', name: 'Username'},
+      // {prop: 'username', name: 'Username'},
       {prop: 'custom_id', name: 'Custom ID'},
     ];
     this.filterFieldName = 'username';

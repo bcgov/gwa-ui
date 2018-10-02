@@ -240,7 +240,7 @@ public class ApiServlet extends BaseAdminServlet implements GwaConstants {
     final HttpServletResponse httpResponse, final String apiId, final String pluginName,
     final String username) {
     this.apiService.handleRequest(httpResponse, httpClient -> {
-      final String userId = this.apiService.getUserId(username);
+      final String userId = this.apiService.userIdGetByUsername(httpClient, username);
 
       final String path = "/plugins?api_id=" + apiId + "&name=" + pluginName + "&consumer_id="
         + userId;

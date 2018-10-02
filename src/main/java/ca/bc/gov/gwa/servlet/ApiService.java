@@ -662,8 +662,8 @@ public class ApiService implements ServletContextListener, GwaConstants {
 
     final BasePrincipal principal = (BasePrincipal)httpRequest.getUserPrincipal();
     final String username = principal.getName();
-    final String consumerId = getUserId(username);
     handleRequest(httpResponse, httpClient -> {
+      final String consumerId = userIdGetByUsername(httpClient, username);
       final String consumerPath = APIS_PATH2 + apiName + PLUGINS_PATH
         + "?name=rate-limiting&api_id=" + apiId + "&consumer_id=" + consumerId;
       final Map<String, Object> limits = new LinkedHashMap<>();
@@ -1146,22 +1146,6 @@ public class ApiService implements ServletContextListener, GwaConstants {
     return 0;
   }
 
-  public String getUserId(final String username) throws IOException {
-    try (
-      JsonHttpClient httpClient = newKongClient()) {
-      final String usernameFilter = "/consumers/?username=" + username;
-      Map<String, Object> consumer = userGet(httpClient, usernameFilter);
-
-      if (consumer.isEmpty()) {
-        // Create if consumer doesn't exist
-        consumer = new HashMap<>();
-        consumer.put(USERNAME, username);
-        consumer = httpClient.put(CONSUMERS_PATH, consumer);
-      }
-      return (String)consumer.get(ID);
-    }
-  }
-
   public String getVersion() {
     if (this.version == null) {
       try (
@@ -1547,14 +1531,45 @@ public class ApiService implements ServletContextListener, GwaConstants {
     this.caching = caching;
   }
 
-  private Map<String, Object> userGet(final JsonHttpClient httpClient, final String filter)
-    throws IOException {
-    final Map<String, Object> consumerResponse = httpClient.get(filter);
+  private Map<String, Object> userGetByCustomId(final JsonHttpClient httpClient,
+    final String customId, final boolean createMissing) throws IOException {
+    final String customIdFilter = "/consumers/?custom_id=" + customId;
+
+    final Map<String, Object> consumerResponse = httpClient.get(customIdFilter);
     final List<Map<String, Object>> consumers = getList(consumerResponse, DATA);
     if (consumers.isEmpty()) {
-      return Collections.emptyMap();
+      if (createMissing) {
+        Map<String, Object> consumer = new HashMap<>();
+        consumer.put(CUSTOM_ID, customId);
+        consumer = httpClient.put(CONSUMERS_PATH, consumer);
+        return consumer;
+      } else {
+        return new LinkedHashMap<>();
+      }
     } else {
       return consumers.get(0);
+    }
+  }
+
+  public Map<String, Object> userGetByUsername(final JsonHttpClient httpClient,
+    final String username, final boolean createMissing) throws IOException {
+    final String usernameFilter = "/consumers/" + username;
+    try {
+      final Map<String, Object> consumer = httpClient.get(usernameFilter);
+      return consumer;
+    } catch (final HttpStatusException e) {
+      if (e.getCode() == 404) {
+        if (createMissing) {
+          Map<String, Object> consumer = new HashMap<>();
+          consumer.put(USERNAME, username);
+          consumer = httpClient.put(CONSUMERS_PATH, consumer);
+          return consumer;
+        } else {
+          return new LinkedHashMap<>();
+        }
+      } else {
+        throw e;
+      }
     }
   }
 
@@ -1590,12 +1605,10 @@ public class ApiService implements ServletContextListener, GwaConstants {
     if (customId == null) {
       consumer = Collections.emptyMap();
     } else {
-      final String customIdFilter = "/consumers/?custom_id=" + customId;
-      consumer = userGet(httpClient, customIdFilter);
+      consumer = userGetByCustomId(httpClient, customId, false);
     }
     if (consumer.isEmpty()) {
-      final String usernameFilter = "/consumers/?username=" + username;
-      consumer = userGet(httpClient, usernameFilter);
+      consumer = userGetByUsername(httpClient, username, false);
     } else {
       // Update if username changed
       if (!username.equals(consumer.get(USERNAME))) {
@@ -1638,6 +1651,12 @@ public class ApiService implements ServletContextListener, GwaConstants {
       JsonHttpClient httpClient = newKongClient()) {
       return userGroups(httpClient, customId, username);
     }
+  }
+
+  public String userIdGetByUsername(final JsonHttpClient httpClient, final String username)
+    throws IOException {
+    final Map<String, Object> consumer = userGetByUsername(httpClient, username, true);
+    return (String)consumer.get(ID);
   }
 
   public void writeInserted(final HttpServletResponse httpResponse, final String id)
