@@ -251,7 +251,7 @@
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpclient</artifactId>
-      <version>4.5.2</version>
+      <version>4.5.3</version>
       <exclusions>
         <exclusion>
           <groupId>commons-logging</groupId>
@@ -331,6 +331,6 @@
     <skip.frontend>false</skip.frontend>
     <cargo.servlet.port>8010</cargo.servlet.port>
     <cargo.rmi.port>8011</cargo.rmi.port>
-    <cargo.start.jvmargs></cargo.start.jvmargs>
+    <cargo.start.jvmargs/>
   </properties>
 </project>
