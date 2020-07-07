@@ -27,7 +27,7 @@
     "@angular/router": "6.1.9",
     "core-js": "^2.5.7",
     "hammerjs": "^2.0.8",
-    "npm": "^6.4.1",
+    "npm": "^6.14.6",
     "revolsys-angular-bcgov-page": "6.1.0-1",
     "revolsys-angular-framework": "6.1.0-1",
     "rxjs": "^6.3.3",
