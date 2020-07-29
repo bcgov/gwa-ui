@@ -43,9 +43,9 @@ public interface GwaConstants {
 
   static String APIS = "apis";
 
-  static String APIS_PATH = "/apis";
+  static String APIS_PATH = "";
 
-  static String APIS_PATH2 = "/apis/";
+  static String APIS_PATH2 = "/";
 
   static String APPLICATION_JSON = "application/json";
 
