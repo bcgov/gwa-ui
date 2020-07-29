@@ -52,7 +52,7 @@ import ca.bc.gov.gwa.http.JsonHttpConsumer;
 import ca.bc.gov.gwa.http.JsonHttpFunction;
 import ca.bc.gov.gwa.servlet.admin.ImportServlet;
 import ca.bc.gov.gwa.servlet.authentication.GitHubPrincipal;
-import ca.bc.gov.gwa.servlet.authentication.SiteminderPrincipal;
+import ca.bc.gov.gwa.servlet.BasePrincipal;
 import ca.bc.gov.gwa.util.Json;
 import ca.bc.gov.gwa.util.LruMap;
 
@@ -692,7 +692,7 @@ public class ApiService implements ServletContextListener, GwaConstants {
     if (paths.isEmpty()) {
       return true;
     } else {
-      final SiteminderPrincipal principal = (SiteminderPrincipal)httpRequest.getUserPrincipal();
+      final BasePrincipal principal = (BasePrincipal)httpRequest.getUserPrincipal();
       if (principal.isUserInRole(ROLE_GWA_ADMIN)) {
         return true;
       } else {
@@ -704,7 +704,7 @@ public class ApiService implements ServletContextListener, GwaConstants {
 
   @SuppressWarnings("unchecked")
   private boolean endpointAccessAllowedApiOwner(final HttpServletResponse httpResponse,
-    final List<String> paths, final SiteminderPrincipal principal) {
+    final List<String> paths, final BasePrincipal principal) {
     if (this.useEndpoints) {
       final String endpointName = paths.get(0);
       final Map<String, Object> api = apiGet(endpointName);
@@ -813,7 +813,7 @@ public class ApiService implements ServletContextListener, GwaConstants {
   public void endpointList(final HttpServletRequest httpRequest,
     final HttpServletResponse httpResponse) {
     handleRequest(httpResponse, httpClient -> {
-      final SiteminderPrincipal principal = (SiteminderPrincipal)httpRequest.getUserPrincipal();
+      final BasePrincipal principal = (BasePrincipal)httpRequest.getUserPrincipal();
       final String path = "/plugins?name=bcgov-gwa-endpoint";
       final Map<String, Object> kongResponse;
       final boolean adminUser = principal.isUserInRole(ROLE_GWA_ADMIN);
