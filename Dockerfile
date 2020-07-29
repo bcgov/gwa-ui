@@ -1,4 +1,4 @@
-FROM maven:3.6-jdk-11-openj9 as BUILD
+FROM maven:3.6.3-openjdk-8 as BUILD
 
 COPY . /app
 

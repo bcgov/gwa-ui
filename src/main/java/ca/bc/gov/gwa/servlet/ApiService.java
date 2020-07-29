@@ -858,8 +858,15 @@ public class ApiService implements ServletContextListener, GwaConstants {
           final Map<String, Object> pageKongResponse = httpClient.getByUrl(urlString);
           final List<Map<String, Object>> pageRows = getList(pageKongResponse, DATA);
           for (final Map<String, Object> plugin : pageRows) {
+            LOG.debug("Plugin", plugin);
+            LOG.debug("BY ID = "+ plugin.get("service"));
+            if (plugin.get("service") != null) {
+                LOG.debug("SERVICE = "+ plugin.get("service").getClass().getName());
+            }
             final String apiId = (String)plugin.get(API_ID);
             final String apiName = apiGetName(httpClient, apiId);
+            LOG.debug("Plugin API_ID = " + apiId);
+            LOG.debug("Plugin API_NAME = " + apiName);
             final Map<String, Object> api = apiGet(apiName);
             if (api != null) {
               final Map<String, Object> endpoint = new LinkedHashMap<>();

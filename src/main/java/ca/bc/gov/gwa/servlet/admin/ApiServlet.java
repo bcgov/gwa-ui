@@ -82,7 +82,7 @@ public class ApiServlet extends BaseAdminServlet implements GwaConstants {
   }
 
   private void apisList(final HttpServletRequest request, final HttpServletResponse response) {
-    this.apiService.handleListAll(request, response, "/apis");
+    this.apiService.handleListAll(request, response, APIS_PATH2);
   }
 
   @Override

@@ -23,7 +23,7 @@ public interface GwaConstants {
 
   static String ACLS_PATH = "/acls";
 
-  static String API_ID = "api_id";
+  static String API_ID = "service_id";
 
   static String API_OWNERS = "api_owners";
 
@@ -43,9 +43,9 @@ public interface GwaConstants {
 
   static String APIS = "apis";
 
-  static String APIS_PATH = "";
+  static String APIS_PATH = "services";
 
-  static String APIS_PATH2 = "/";
+  static String APIS_PATH2 = "/services/";
 
   static String APPLICATION_JSON = "application/json";
 
