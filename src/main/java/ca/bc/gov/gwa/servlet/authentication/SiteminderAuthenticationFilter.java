@@ -19,11 +19,11 @@ import org.slf4j.LoggerFactory;
 import ca.bc.gov.gwa.servlet.AbstractFilter;
 import ca.bc.gov.gwa.servlet.ApiService;
 
-@WebFilter(urlPatterns = {
-  "/int/ui/*", "/int/rest/*", "/int/logout", "/int/login/*"
-}, servletNames = {
-  "AdminUiServlet"
-})
+// @WebFilter(urlPatterns = {
+//   "/int/ui/*", "/int/rest/*", "/int/logout", "/int/login/*"
+// }, servletNames = {
+//   "AdminUiServlet"
+// })
 public class SiteminderAuthenticationFilter extends AbstractFilter {
 
   private static final int EXPIRY_TIME_MS = 10 * 60 * 1000;

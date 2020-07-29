@@ -25,7 +25,8 @@ import ca.bc.gov.gwa.servlet.ApiService;
 import ca.bc.gov.gwa.util.LruMap;
 
 @WebFilter(urlPatterns = {
-  "/", "/login/*", "/git/*", "/logout", "/rest/*", "/ui/*"
+  "/", "/login/*", "/git/*", "/logout", "/rest/*", "/ui/*",
+  "/int/ui/*", "/int/rest/*", "/int/logout", "/int/login/*"
 })
 public class DeveloperKeyAuthenticationFilter extends AbstractFilter {
 
@@ -150,6 +151,10 @@ public class DeveloperKeyAuthenticationFilter extends AbstractFilter {
                 }
                 principal.addDeveloperRole();
               }
+              if (kongGroups.contains(GitHubPrincipal.ADMIN_ROLE)) {
+                principal.addAdminRole();
+              }
+
               session.setAttribute(GIT_HUB_PRINCIPAL, principal);
               sendRedirect(httpResponse, redirectUrl);
               return;
