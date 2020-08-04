@@ -1,5 +1,7 @@
 FROM maven:3.6.3-openjdk-8 as BUILD
-COPY gwa-ui gwa-ui
+COPY src gwa-ui/src
+COPY angular gwa-ui/angular
+COPY pom.xml gwa-ui/pom.xml
 
 WORKDIR gwa-ui
 RUN mvn install
