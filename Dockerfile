@@ -7,4 +7,4 @@ WORKDIR gwa-ui
 RUN mvn install
 
 FROM alpine
-COPY --from=BUILD /gwa-ui/target/*.war /app.war
+COPY --from=BUILD /gwa-ui/target/*.war /ROOT.war
