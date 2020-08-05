@@ -47,6 +47,20 @@ public interface GwaConstants {
 
   static String APIS_PATH2 = "/services/";
 
+  static String ROUTES = "routes";
+
+  static String ROUTES_PATH = "/routes";
+
+  static String ROUTES_PATH2 = "/routes/";
+
+  static String SERVICES = "services";
+
+  static String SERVICE_PATH = "/service";
+
+  static String SERVICES_PATH = "/services";
+
+  static String SERVICES_PATH2 = "/services/";
+
   static String APPLICATION_JSON = "application/json";
 
   static String BCGOV_GWA_ENDPOINT = "bcgov-gwa-endpoint";

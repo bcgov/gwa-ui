@@ -237,6 +237,20 @@ public class ApiService implements ServletContextListener, GwaConstants {
             }
           }
           apiResponse.put(PLUGINS, pluginByName);
+
+
+          final Map<String, Object> routesResponse = httpClient
+            .get(APIS_PATH2 + apiId + ROUTES_PATH);
+          final List<Map<String, Object>> routes = getList(routesResponse, DATA);
+          final Map<String, Map<String, Object>> routesByName = new TreeMap<>();
+          for (final Map<String, Object> route : routes) {
+            final String name = (String)route.get(NAME);
+            //final Map<String, Object> config = (Map<String, Object>)route.get(CONFIG);
+            //fixMapToList(config);
+            routesByName.put(name, route);
+          }
+          apiResponse.put(ROUTES, routesByName);
+
           return apiResponse;
         }
       });
@@ -858,33 +872,61 @@ public class ApiService implements ServletContextListener, GwaConstants {
           final Map<String, Object> pageKongResponse = httpClient.getByUrl(urlString);
           final List<Map<String, Object>> pageRows = getList(pageKongResponse, DATA);
           for (final Map<String, Object> plugin : pageRows) {
-            LOG.debug("Plugin", plugin);
+            for ( final String k : plugin.keySet()) {
+                LOG.debug("PLUGIN : " + k + " : " + plugin.get(k));
+            }
+            LOG.debug("Plugin" + plugin);
             LOG.debug("BY ID = "+ plugin.get("service"));
             if (plugin.get("service") != null) {
-                LOG.debug("SERVICE = "+ plugin.get("service").getClass().getName());
-            }
-            final String apiId = (String)plugin.get(API_ID);
-            final String apiName = apiGetName(httpClient, apiId);
-            LOG.debug("Plugin API_ID = " + apiId);
-            LOG.debug("Plugin API_NAME = " + apiName);
-            final Map<String, Object> api = apiGet(apiName);
-            if (api != null) {
-              final Map<String, Object> endpoint = new LinkedHashMap<>();
-              for (final String fieldName : Arrays.asList(ID, NAME, CREATED_AT, HOSTS, "uris")) {
-                final Object values = api.get(fieldName);
-                endpoint.put(fieldName, values);
-              }
-              if (filter.test(endpoint)) {
-                if (adminUser) {
-                  allEndpoints.add(endpoint);
-                } else {
-                  final Map<String, Object> config = (Map<String, Object>)plugin.get(CONFIG);
-                  final List<String> apiOwners = getList(config, API_OWNERS);
-                  if (apiOwners.contains(username)) {
-                    allEndpoints.add(endpoint);
-                  }
+                Map<String, Object> svc = (Map<String, Object>) plugin.get("service");
+
+                LOG.debug("SERVICE = "+ svc.get("id"));
+                final String apiId = (String)svc.get("id");
+                final String apiName = apiGetName(httpClient, apiId);
+                LOG.debug("Plugin API_ID = " + apiId);
+                LOG.debug("Plugin API_NAME = " + apiName);
+                final Map<String, Object> api = apiGet(apiName);
+                if (api != null) {
+
+                    for ( final String k : api.keySet()) {
+                        LOG.debug("API : " + k + " : " + api.get(k));
+                    }
+
+                Map<String, Object> routes = (Map<String, Object>) api.get("routes");
+
+                for ( final String routeName : routes.keySet()) {
+                    final Map<String, Object> route = (Map<String, Object>) routes.get(routeName);
+
+                    final Map<String, Object> endpoint = new LinkedHashMap<>();
+
+                    for (final String fieldName : Arrays.asList(ID, NAME, CREATED_AT, HOSTS, "paths")) {
+                        final Object values = route.get(fieldName);
+                        endpoint.put(fieldName, values);
+                        // Backward compatiblity to Kong endpoints
+                        if (fieldName.equals("paths")) {
+                            endpoint.put("uris", values);
+                        }
+                    }
+
+                    final long createdAt = ((Number)endpoint.get(CREATED_AT)).longValue();
+                    endpoint.put(CREATED_AT, createdAt * 1000);
+
+                    endpoint.put("id", api.get("id"));
+                    endpoint.put("name", api.get("name"));
+
+                    if (filter.test(endpoint)) {
+                        if (adminUser) {
+                        allEndpoints.add(endpoint);
+                        } else {
+                        final Map<String, Object> config = (Map<String, Object>)plugin.get(CONFIG);
+                        final List<String> apiOwners = getList(config, API_OWNERS);
+                        if (apiOwners.contains(username)) {
+                            allEndpoints.add(endpoint);
+                        }
+                        }
+                    }
+                    }
                 }
-              }
             }
 
           }
