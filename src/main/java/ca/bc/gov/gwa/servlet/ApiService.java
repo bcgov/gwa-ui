@@ -629,9 +629,12 @@ public class ApiService implements ServletContextListener, GwaConstants {
 
       final Map<String, Map<String, Object>> apiByName = new TreeMap<>();
 
+      LOG.debug("For GROUPS " + groups);
+
       final LinkedList<String> apiIds = new LinkedList<>();
       final String path = "/plugins?name=acl";
       kongPageAll(httpRequest, httpClient, path, acl -> {
+        LOG.debug("For ACL " + acl);
         if (acl.get(CONSUMER_ID) == null) {
           final Map<String, Object> config = (Map<String, Object>)acl.get(CONFIG);
           final List<String> blacklist = getList(config, "blacklist");
@@ -639,8 +642,13 @@ public class ApiService implements ServletContextListener, GwaConstants {
           if (containsAny(blacklist, groups)) {
             // Ignore blacklist
           } else if (whitelist.isEmpty() || containsAny(whitelist, groups)) {
-            final String apiId = (String)acl.get(API_ID);
+            final String apiId = lookupServiceId(acl);
+
+            LOG.debug("ADDED = " + apiId);
             apiIds.add(apiId);
+          } else {
+            LOG.debug("Empty Handed for " + acl);
+
           }
         }
       });
@@ -878,10 +886,8 @@ public class ApiService implements ServletContextListener, GwaConstants {
             LOG.debug("Plugin" + plugin);
             LOG.debug("BY ID = "+ plugin.get("service"));
             if (plugin.get("service") != null) {
-                Map<String, Object> svc = (Map<String, Object>) plugin.get("service");
+                final String apiId = lookupServiceId(svc);
 
-                LOG.debug("SERVICE = "+ svc.get("id"));
-                final String apiId = (String)svc.get("id");
                 final String apiName = apiGetName(httpClient, apiId);
                 LOG.debug("Plugin API_ID = " + apiId);
                 LOG.debug("Plugin API_NAME = " + apiName);
@@ -1772,5 +1778,12 @@ public class ApiService implements ServletContextListener, GwaConstants {
     response.put(DATA, rows);
     response.put(TOTAL, rows.size());
     Json.writeJson(httpResponse, response);
+  }
+
+  private String lookupServiceId (Map<String, Object> record) {
+    Map<String, Object> svc = (Map<String, Object>) record.get("service");
+
+    LOG.debug("LOOKUP SERVICE = "+ svc.get("id"));
+    return (String)svc.get("id");
   }
 }
