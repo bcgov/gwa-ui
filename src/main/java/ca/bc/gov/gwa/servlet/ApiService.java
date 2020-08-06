@@ -1782,7 +1782,10 @@ public class ApiService implements ServletContextListener, GwaConstants {
 
   private String lookupServiceId (Map<String, Object> record) {
     Map<String, Object> svc = (Map<String, Object>) record.get("service");
-
+    if (svc == null) {
+        LOG.debug("NULL SERVICE");
+        return null;
+    }
     LOG.debug("LOOKUP SERVICE = "+ svc.get("id"));
     return (String)svc.get("id");
   }
