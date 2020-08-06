@@ -886,7 +886,7 @@ public class ApiService implements ServletContextListener, GwaConstants {
             LOG.debug("Plugin" + plugin);
             LOG.debug("BY ID = "+ plugin.get("service"));
             if (plugin.get("service") != null) {
-                final String apiId = lookupServiceId(svc);
+                final String apiId = lookupServiceId(plugin);
 
                 final String apiName = apiGetName(httpClient, apiId);
                 LOG.debug("Plugin API_ID = " + apiId);
