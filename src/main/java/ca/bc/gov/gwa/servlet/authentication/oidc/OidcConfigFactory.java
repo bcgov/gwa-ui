@@ -11,13 +11,13 @@ import org.pac4j.core.config.ConfigFactory;
 import org.pac4j.core.engine.DefaultSecurityLogic;
 import org.pac4j.oidc.client.KeycloakOidcClient;
 import org.pac4j.oidc.config.KeycloakOidcConfiguration;
-import ca.bc.gov.gwa.v2.config.ApiConfig;
+import ca.bc.gov.gwa.v2.conf.GwaSettings;
 
 public class OidcConfigFactory implements ConfigFactory {
 
     @Override
     public Config build(final Object... parameters) {
-        final ApiConfig settings = new ApiConfig();
+        final GwaSettings settings = new GwaSettings();
         
         final KeycloakOidcConfiguration oidcConfiguration = new KeycloakOidcConfiguration();
         oidcConfiguration.setRealm(settings.getOidcRealm());

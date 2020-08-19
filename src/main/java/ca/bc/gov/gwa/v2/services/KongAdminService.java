@@ -9,7 +9,7 @@ import ca.bc.gov.gwa.http.JsonHttpClient;
 import static ca.bc.gov.gwa.servlet.GwaConstants.DATA;
 import static ca.bc.gov.gwa.servlet.GwaConstants.NEXT;
 import static ca.bc.gov.gwa.servlet.GwaConstants.TOTAL;
-import ca.bc.gov.gwa.v2.config.ApiConfig;
+import ca.bc.gov.gwa.v2.conf.GwaSettings;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,9 +27,9 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class KongAdminService {
   
-  ApiConfig config;
+  GwaSettings config;
   
-  public KongAdminService (ApiConfig config) {
+  public KongAdminService (GwaSettings config) {
       this.config = config;
   }
   

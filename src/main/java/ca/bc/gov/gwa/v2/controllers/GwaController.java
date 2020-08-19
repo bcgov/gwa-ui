@@ -21,7 +21,7 @@ import static ca.bc.gov.gwa.servlet.GwaConstants.UPDATED;
 import ca.bc.gov.gwa.servlet.admin.ImportServlet;
 import ca.bc.gov.gwa.util.Json;
 import ca.bc.gov.gwa.util.LruMap;
-import ca.bc.gov.gwa.v2.config.ApiConfig;
+import ca.bc.gov.gwa.v2.conf.GwaSettings;
 import ca.bc.gov.gwa.v2.services.KongAdminService;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -48,7 +48,7 @@ public class GwaController implements ServletContextListener, GwaConstants {
   public static final Logger LOG = LoggerFactory.getLogger(GwaController.class);
 
 
-  final ApiConfig config = new ApiConfig();
+  final GwaSettings config = new GwaSettings();
   
   KongAdminService kongAdminService = new KongAdminService (config);
   
