@@ -8,7 +8,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import ca.bc.gov.gwa.servlet.ApiService;
+import ca.bc.gov.gwa.v1.ApiService;
 import ca.bc.gov.gwa.servlet.BaseServlet;
 import ca.bc.gov.gwa.servlet.authentication.GitHubPrincipal;
 
@@ -19,7 +19,7 @@ public class DeveloperApiServlet extends BaseServlet {
   @Override
   protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
     throws ServletException, IOException {
-    if (GitHubPrincipal.hasDeveloperRole(request)) {
+    if (GitHubPrincipal.hasDeveloperRole(request, response)) {
       this.apiService.developerApiList(request, response);
     } else {
       response.setContentType(ApiService.APPLICATION_JSON);

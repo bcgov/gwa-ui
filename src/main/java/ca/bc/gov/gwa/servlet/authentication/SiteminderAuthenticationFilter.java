@@ -17,7 +17,7 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.LoggerFactory;
 
 import ca.bc.gov.gwa.servlet.AbstractFilter;
-import ca.bc.gov.gwa.servlet.ApiService;
+import ca.bc.gov.gwa.v1.ApiService;
 
 // @WebFilter(urlPatterns = {
 //   "/int/ui/*", "/int/rest/*", "/int/logout", "/int/login/*"

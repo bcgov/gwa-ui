@@ -1,4 +1,4 @@
-package ca.bc.gov.gwa.servlet;
+package ca.bc.gov.gwa.v1;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -53,8 +53,11 @@ import ca.bc.gov.gwa.http.JsonHttpFunction;
 import ca.bc.gov.gwa.servlet.admin.ImportServlet;
 import ca.bc.gov.gwa.servlet.authentication.GitHubPrincipal;
 import ca.bc.gov.gwa.servlet.BasePrincipal;
+import ca.bc.gov.gwa.servlet.GwaConstants;
+import ca.bc.gov.gwa.servlet.authentication.oidc.LookupUtil;
 import ca.bc.gov.gwa.util.Json;
 import ca.bc.gov.gwa.util.LruMap;
+import org.pac4j.core.profile.UserProfile;
 
 @WebListener
 public class ApiService implements ServletContextListener, GwaConstants {
@@ -172,6 +175,19 @@ public class ApiService implements ServletContextListener, GwaConstants {
     }
   }
 
+  public void addConsumerToGroup(final String consumerId, final String groupName)
+    throws IOException {
+    try (
+      JsonHttpClient httpClient = newKongClient()) {
+      final Set<String> groups = consumerAclGroups(httpClient, consumerId);
+      if (!groups.contains(groupName)) {
+        final Map<String, Object> aclRequest = Collections.singletonMap(GROUP, groupName);
+        final String aclPath = ApiService.CONSUMERS_PATH2 + consumerId + ApiService.ACLS_PATH;
+        httpClient.post(aclPath, aclRequest);
+      }
+    }
+  }
+  
   @SuppressWarnings("unchecked")
   public void apiAddPlugin(final JsonHttpClient client, final Map<String, Object> requestData,
     final String apiId, final String pluginName, final List<String> fieldNames,
@@ -223,6 +239,7 @@ public class ApiService implements ServletContextListener, GwaConstants {
         if (apiId == null) {
           return null;
         } else {
+          fixCreated(apiResponse);
           fixHostsMapToList(apiResponse);
           final Map<String, Object> pluginsResponse = httpClient
             .get(APIS_PATH2 + apiId + PLUGINS_PATH);
@@ -397,9 +414,10 @@ public class ApiService implements ServletContextListener, GwaConstants {
         do {
           final Map<String, Object> kongResponse = httpClient.getByUrl(urlString);
           final List<Map<String, Object>> keyAuths = getList(kongResponse, DATA);
+          LOG.debug("Evaluating {} key-auths records", keyAuths.size());
           for (final Map<String, Object> keyAuth : keyAuths) {
-            final String consumerId = (String)keyAuth.get(CONSUMER_ID);
-            final long createdAt = ((Number)keyAuth.get(CREATED_AT)).longValue();
+            final String consumerId = lookupReferenceId(keyAuth, CONSUMER);
+            final long createdAt = created (keyAuth);
             final long mostRecentKeyAge = keyAgeByConsumerId.getOrDefault(consumerId, 0L);
             if (createdAt > mostRecentKeyAge) {
               keyAgeByConsumerId.put(consumerId, createdAt);
@@ -411,11 +429,15 @@ public class ApiService implements ServletContextListener, GwaConstants {
                 username = userGetUsername(httpClient, consumerId);
                 usernameById.put(consumerId, username);
               }
+              if (username == null) {
+                  LOG.error("Still username is empty yep!");
+              } else
               if (username.startsWith("github_")) {
                 createKeyConsumerIds.add(consumerId);
 
                 if (createdAt < oldestTime) {
                   // DELETE expired key
+                  LOG.debug("Token expired for consumer {}, doing cleanup/deletion", consumerId);
                   final String deletePath = CONSUMERS_PATH2 + consumerId + "/key-auth/" + id;
                   try {
                     httpClient.delete(deletePath);
@@ -541,8 +563,10 @@ public class ApiService implements ServletContextListener, GwaConstants {
    */
   public void developerApiKeyAdd(final HttpServletRequest httpRequest,
     final HttpServletResponse httpResponse) {
+      System.out.println("developerApiKeyAdd");
     handleRequest(httpResponse, httpClient -> {
-      final String userId = httpRequest.getRemoteUser();
+      final String userId = httpRequest.getUserPrincipal().getName();
+      System.out.println("User ID = "+userId);
       final String keyAuthPath = CONSUMERS_PATH2 + userId + "/" + KEY_AUTH;
       final Map<String, Object> apiKeyResponse = httpClient.post(keyAuthPath,
         Collections.emptyMap());
@@ -616,6 +640,7 @@ public class ApiService implements ServletContextListener, GwaConstants {
 
   private void developerApiKeyRecordValues(final Map<String, Object> keyAuth) {
     keyAuth.keySet().retainAll(DEV_API_KEY_FIELD_NAMES);
+    fixCreated(keyAuth);
     keyAuth.put("maxAgeDays", this.apiKeyExpiryDays);
   }
 
@@ -624,8 +649,9 @@ public class ApiService implements ServletContextListener, GwaConstants {
     final HttpServletResponse httpResponse) {
     handleRequest(httpResponse, httpClient -> {
 
-      final BasePrincipal userPrincipal = (BasePrincipal)httpRequest.getUserPrincipal();
-      final Set<String> groups = userGroups(httpClient, userPrincipal);
+      final Principal userPrincipal = httpRequest.getUserPrincipal();
+ 
+      final Set<String> groups = consumerAclGroups(httpClient, userPrincipal.getName());
 
       final Map<String, Map<String, Object>> apiByName = new TreeMap<>();
 
@@ -642,7 +668,7 @@ public class ApiService implements ServletContextListener, GwaConstants {
           if (containsAny(blacklist, groups)) {
             // Ignore blacklist
           } else if (whitelist.isEmpty() || containsAny(whitelist, groups)) {
-            final String apiId = lookupServiceId(acl);
+            final String apiId = lookupReferenceId(acl, "service");
 
             LOG.debug("ADDED = " + apiId);
             apiIds.add(apiId);
@@ -682,10 +708,10 @@ public class ApiService implements ServletContextListener, GwaConstants {
     final HttpServletResponse httpResponse, final String apiName) throws IOException {
     final String apiId = apiGetId(apiName);
 
-    final BasePrincipal principal = (BasePrincipal)httpRequest.getUserPrincipal();
+    final Principal principal = httpRequest.getUserPrincipal();
     final String username = principal.getName();
     handleRequest(httpResponse, httpClient -> {
-      final String consumerId = userIdGetByUsername(httpClient, username);
+      final String consumerId = consumerIdGetByUsername(httpClient, username);
       final String consumerPath = APIS_PATH2 + apiName + PLUGINS_PATH
         + "?name=rate-limiting&api_id=" + apiId + "&consumer_id=" + consumerId;
       final Map<String, Object> limits = new LinkedHashMap<>();
@@ -714,19 +740,21 @@ public class ApiService implements ServletContextListener, GwaConstants {
     if (paths.isEmpty()) {
       return true;
     } else {
-      final BasePrincipal principal = (BasePrincipal)httpRequest.getUserPrincipal();
-      if (principal.isUserInRole(ROLE_GWA_ADMIN)) {
-        return true;
-      } else {
+        final Principal principal = httpRequest.getUserPrincipal();
+        
+      //final BasePrincipal principal = (BasePrincipal)httpRequest.getUserPrincipal();
+      //if (principal.isUserInRole(ROLE_GWA_ADMIN)) {
+      //  return true;
+      //} else {
         return endpointAccessAllowedApiOwner(httpResponse, paths, principal);
-      }
+      //}
 
     }
   }
 
   @SuppressWarnings("unchecked")
   private boolean endpointAccessAllowedApiOwner(final HttpServletResponse httpResponse,
-    final List<String> paths, final BasePrincipal principal) {
+    final List<String> paths, final Principal principal) {
     if (this.useEndpoints) {
       final String endpointName = paths.get(0);
       final Map<String, Object> api = apiGet(endpointName);
@@ -775,6 +803,14 @@ public class ApiService implements ServletContextListener, GwaConstants {
     });
   }
 
+  /**
+   * Only allow group management of the group if it is associated with the endpoint/service
+   * 
+   * @param httpRequest
+   * @param httpResponse
+   * @param apiName
+   * @param groupName 
+   */
   public void endpointGroupUserList(final HttpServletRequest httpRequest,
     final HttpServletResponse httpResponse, final String apiName, final String groupName) {
     final boolean hasGroup = endpointHasGroup(apiName, groupName);
@@ -835,10 +871,11 @@ public class ApiService implements ServletContextListener, GwaConstants {
   public void endpointList(final HttpServletRequest httpRequest,
     final HttpServletResponse httpResponse) {
     handleRequest(httpResponse, httpClient -> {
-      final BasePrincipal principal = (BasePrincipal)httpRequest.getUserPrincipal();
+      final Principal principal = httpRequest.getUserPrincipal();
+      final UserProfile user = LookupUtil.lookupUserProfile(httpRequest, httpResponse);
       final String path = "/plugins?name=bcgov-gwa-endpoint";
       final Map<String, Object> kongResponse;
-      final boolean adminUser = principal.isUserInRole(ROLE_GWA_ADMIN);
+      final boolean adminUser = false; //principal.isUserInRole(ROLE_GWA_ADMIN);
       final String username = principal.getName();
       final List<Map<String, Object>> allEndpoints = new ArrayList<>();
       try {
@@ -886,7 +923,7 @@ public class ApiService implements ServletContextListener, GwaConstants {
             LOG.debug("Plugin" + plugin);
             LOG.debug("BY ID = "+ plugin.get("service"));
             if (plugin.get("service") != null) {
-                final String apiId = lookupServiceId(plugin);
+                final String apiId = lookupReferenceId(plugin, "service");
 
                 final String apiName = apiGetName(httpClient, apiId);
                 LOG.debug("Plugin API_ID = " + apiId);
@@ -1264,6 +1301,14 @@ public class ApiService implements ServletContextListener, GwaConstants {
     handleDelete(httpResponse, path);
   }
 
+  /**
+   * This is relying on the custom lua bcgov/gwa-kong-endpoint to run because it
+   * maintains the "groups" objects.
+   * 
+   * @param httpRequest
+   * @param httpResponse
+   * @param path 
+   */
   public void groupUserList(final HttpServletRequest httpRequest,
     final HttpServletResponse httpResponse, final String path) {
     handleRequest(httpResponse, httpClient -> {
@@ -1606,7 +1651,7 @@ public class ApiService implements ServletContextListener, GwaConstants {
     }
   }
 
-  public Map<String, Object> userGetByUsername(final JsonHttpClient httpClient,
+  public Map<String, Object> consumerGetByUsername(final JsonHttpClient httpClient,
     final String username, final boolean createMissing) throws IOException {
     final String usernameFilter = "/consumers/" + username;
     try {
@@ -1629,6 +1674,7 @@ public class ApiService implements ServletContextListener, GwaConstants {
   }
 
   private String userGetUsername(final JsonHttpClient httpClient, final String consumerId) {
+    LOG.debug("Looking up user {} in Kong as a consumer", consumerId);
     String username = this.usernameByConsumerId.get(consumerId);
     if (username == null) {
       username = consumerId;
@@ -1663,7 +1709,7 @@ public class ApiService implements ServletContextListener, GwaConstants {
       consumer = userGetByCustomId(httpClient, customId, false);
     }
     if (consumer.isEmpty()) {
-      consumer = userGetByUsername(httpClient, username, false);
+      consumer = consumerGetByUsername(httpClient, username, false);
     } else {
       // Update if username changed
       if (!username.equals(consumer.get(USERNAME))) {
@@ -1689,9 +1735,15 @@ public class ApiService implements ServletContextListener, GwaConstants {
       }
     }
     final String id = (String)consumer.get(ID);
+    return consumerAclGroups(httpClient, id);
+  }
+  
+  public Set<String> consumerAclGroups(final JsonHttpClient httpClient, final String consumerId) throws IOException {
+    final Set<String> roles = new TreeSet<>();
+    Map<String, Object> consumer;
 
-    this.usernameByConsumerId.put(id, username);
-    final String groupsPath = CONSUMERS_PATH2 + id + ACLS_PATH;
+    //this.usernameByConsumerId.put(id, username);
+    final String groupsPath = CONSUMERS_PATH2 + consumerId + ACLS_PATH;
     final Map<String, Object> groupsResponse = httpClient.get(groupsPath);
     final List<Map<String, Object>> groupList = getList(groupsResponse, DATA);
     for (final Map<String, Object> groupRecord : groupList) {
@@ -1708,9 +1760,9 @@ public class ApiService implements ServletContextListener, GwaConstants {
     }
   }
 
-  public String userIdGetByUsername(final JsonHttpClient httpClient, final String username)
+  public String consumerIdGetByUsername(final JsonHttpClient httpClient, final String username)
     throws IOException {
-    final Map<String, Object> consumer = userGetByUsername(httpClient, username, true);
+    final Map<String, Object> consumer = consumerGetByUsername(httpClient, username, true);
     return (String)consumer.get(ID);
   }
 
@@ -1780,13 +1832,42 @@ public class ApiService implements ServletContextListener, GwaConstants {
     Json.writeJson(httpResponse, response);
   }
 
-  private String lookupServiceId (Map<String, Object> record) {
-    Map<String, Object> svc = (Map<String, Object>) record.get("service");
-    if (svc == null) {
-        LOG.debug("NULL SERVICE");
+  /**
+   * 
+   * @param record
+   * @param type : Examples 'service', 'consumer'
+   * @return 
+   */
+  private String lookupReferenceId (Map<String, Object> record, String type) {
+    Map<String, Object> ref = (Map<String, Object>) record.get(type);
+    if (ref == null) {
+        LOG.error("NULL RECORD FOR {}", type);
         return null;
     }
-    LOG.debug("LOOKUP SERVICE = "+ svc.get("id"));
-    return (String)svc.get("id");
+    LOG.debug("LOOKUP {} = {}", type, ref.get("id"));
+    return (String)ref.get("id");
   }
+  
+  /**
+   * Depending on the backend storage, the created timestamp can be in
+   * seconds or milliseconds.  The frontend assumes milliseconds.
+   * For Postgres, we have seconds.
+   * @param record
+   * @return 
+   */
+  private void fixCreated (Map<String, Object> record) {
+    if (record.containsKey(CREATED_AT)) {
+        record.put(CREATED_AT, BigDecimal.valueOf(((Number)record.get(CREATED_AT)).longValue() * 1000));
+    }
+  }
+
+  private Long created (Map<String, Object> record) {
+    if (record.containsKey(CREATED_AT)) {
+        return ((Number)record.get(CREATED_AT)).longValue() * 1000;
+    } else {
+        return null;
+    }
+  }
+
 }
+

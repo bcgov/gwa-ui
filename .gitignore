@@ -9,6 +9,7 @@ target
 ~*
 *.tmp
 *.ldb
+*.iml
 log/
 config
 angular/node
@@ -17,3 +18,4 @@ node_modules
 /.externalToolBuilders/
 .tern-project
 .vscode
+.idea

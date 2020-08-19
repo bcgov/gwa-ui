@@ -1,5 +1,6 @@
 package ca.bc.gov.gwa.servlet;
 
+import ca.bc.gov.gwa.v1.ApiService;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Set;

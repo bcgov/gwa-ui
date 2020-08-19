@@ -28,7 +28,7 @@ export class ApiViewComponent extends BaseDetailComponent<Api> implements OnInit
   acl: Plugin = new Plugin(
     'acl',
     {
-      whitelist: [],
+      allow: [],
       blacklist: []
     },
     false
@@ -69,7 +69,7 @@ export class ApiViewComponent extends BaseDetailComponent<Api> implements OnInit
   }
 
   groupNameSelected(event: MatAutocompleteSelectedEvent): void {
-    this.acl.config.whitelist.push(event.option.viewValue);
+    this.acl.config.allow.push(event.option.viewValue);
     this.groupNameInput.nativeElement.value = '';
     this.groupNameControl.setValue(null);
   }
@@ -134,7 +134,7 @@ export class ApiViewComponent extends BaseDetailComponent<Api> implements OnInit
   }
 
   addGroupName(event: MatChipInputEvent): void {
-    this.addValue(this.acl.config.whitelist, event);
+    this.addValue(this.acl.config.allow, event);
   }
 
   addHost(event: MatChipInputEvent): void {
@@ -162,7 +162,7 @@ export class ApiViewComponent extends BaseDetailComponent<Api> implements OnInit
   }
 
   deleteGroupName(apiOwner: string): void {
-    this.deleteValue(this.acl.config.whitelist, apiOwner);
+    this.deleteValue(this.acl.config.allow, apiOwner);
   }
 
   deleteHost(host: string): void {
@@ -182,8 +182,8 @@ export class ApiViewComponent extends BaseDetailComponent<Api> implements OnInit
 
   get developerKeyGroupNames(): string[] {
     const groupNames: string[] = [];
-    if (this.acl && this.acl.config.whitelist) {
-      for (let groupName of this.acl.config.whitelist) {
+    if (this.acl && this.acl.config.allow) {
+      for (let groupName of this.acl.config.allow) {
         groupName = groupName.trim().toLowerCase();
         if (groupName.length === 0) {
         } else if (groupName.indexOf('idir') === 0) {

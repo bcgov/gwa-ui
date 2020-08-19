@@ -84,6 +84,7 @@ public class EndpointServlet extends BaseServlet {
   private void doGetGroupUserList(final HttpServletRequest request,
     final HttpServletResponse response, final List<String> paths, final String apiName) {
     final String groupName = paths.get(2);
+    System.out.println("Getting " + groupName);
     this.apiService.endpointGroupUserList(request, response, apiName, groupName);
   }
 

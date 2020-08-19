@@ -80,7 +80,7 @@ public interface Json {
   static String toString(final Object value) {
     final StringWriter stringWriter = new StringWriter();
     try (
-      JsonWriter jsonWriter = new JsonWriter(stringWriter)) {
+      JsonWriter jsonWriter = new JsonWriter(stringWriter, true)) {
       jsonWriter.value(value);
       return stringWriter.toString();
     } catch (final IOException e) {

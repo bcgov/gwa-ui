@@ -8,7 +8,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import ca.bc.gov.gwa.servlet.ApiService;
+import ca.bc.gov.gwa.v1.ApiService;
 import ca.bc.gov.gwa.servlet.GwaConstants;
 import ca.bc.gov.gwa.util.Json;
 
@@ -240,7 +240,7 @@ public class ApiServlet extends BaseAdminServlet implements GwaConstants {
     final HttpServletResponse httpResponse, final String apiId, final String pluginName,
     final String username) {
     this.apiService.handleRequest(httpResponse, httpClient -> {
-      final String userId = this.apiService.userIdGetByUsername(httpClient, username);
+      final String userId = this.apiService.consumerIdGetByUsername(httpClient, username);
 
       final String path = "/plugins?api_id=" + apiId + "&name=" + pluginName + "&consumer_id="
         + userId;

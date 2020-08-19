@@ -67,6 +67,8 @@ public interface GwaConstants {
 
   static String CONFIG = "config";
 
+  static String CONSUMER = "consumer";
+
   static String CONSUMER_ID = "consumer_id";
 
   static String CONSUMERS = "consumers";
@@ -143,7 +145,7 @@ public interface GwaConstants {
 
   static String VERSION = "version";
 
-  static String WHITELIST = "whitelist";
+  static String WHITELIST = "allow";
 
   static List<String> ACL_FIELD_NAMES = Arrays.asList(WHITELIST);
 
