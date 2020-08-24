@@ -1,9 +1,5 @@
 package ca.bc.gov.gwa.servlet;
 
-import static ca.bc.gov.gwa.servlet.Test.ALGO_TRANSFORMATION_STRING;
-import static ca.bc.gov.gwa.servlet.Test.aesEncrypt;
-import static ca.bc.gov.gwa.servlet.Test.loadKey;
-import static ca.bc.gov.gwa.servlet.authentication.GitHubPrincipal.DEVELOPER_ROLE;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.Collections;
@@ -54,6 +50,8 @@ import static org.apache.commons.io.FileUtils.readFileToByteArray;
 public class EncrypterServlet extends BaseServlet {
 
     private static final long serialVersionUID = 1L;
+
+    public static String ALGO_TRANSFORMATION_STRING = "AES/CBC/PKCS5Padding" ;
 
     private static final int IV_SIZE = 16;
 
