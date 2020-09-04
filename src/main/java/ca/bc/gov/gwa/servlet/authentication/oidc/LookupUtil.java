@@ -19,7 +19,7 @@ import org.pac4j.core.profile.UserProfile;
  * @author aidancope
  */
 public class LookupUtil {
-    static public UserProfile lookupUserProfile(HttpServletRequest request, HttpServletResponse response) {
+    static public CommonProfile lookupUserProfile(HttpServletRequest request, HttpServletResponse response) {
         final WebContext webContext = new JEEContext(request, response);
 
         ProfileManager<CommonProfile> profileManager = new ProfileManager(webContext);

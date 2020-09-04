@@ -23,7 +23,6 @@ import java.io.IOException;
 import javax.servlet.annotation.WebFilter;
 
 @WebFilter(urlPatterns = {
-  "/logout", "/int/logout"
 })
 public class ForceLoginFilter extends AbstractConfigFilter {
 
@@ -48,6 +47,7 @@ public class ForceLoginFilter extends AbstractConfigFilter {
         } catch (final HttpAction e) {
             action = e;
         }
+        
         JEEHttpActionAdapter.INSTANCE.adapt(action, context);
     }
 }

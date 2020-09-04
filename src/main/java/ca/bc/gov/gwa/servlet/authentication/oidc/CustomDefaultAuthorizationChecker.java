@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import org.pac4j.core.authorization.authorizer.Authorizer;
 import org.pac4j.core.authorization.checker.AuthorizationChecker;
+import org.pac4j.core.authorization.checker.DefaultAuthorizationChecker;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.profile.UserProfile;
 
@@ -16,7 +17,7 @@ import org.pac4j.core.profile.UserProfile;
  *
  * @author aidancope
  */
-public class CustomDefaultAuthorizationChecker implements AuthorizationChecker {
+public class CustomDefaultAuthorizationChecker extends DefaultAuthorizationChecker {
 
     @Override
     public boolean isAuthorized(WebContext wc, List<UserProfile> list, String string, Map<String, Authorizer> map) {

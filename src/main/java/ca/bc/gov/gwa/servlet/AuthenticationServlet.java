@@ -1,5 +1,6 @@
 package ca.bc.gov.gwa.servlet;
 
+import static ca.bc.gov.gwa.servlet.authentication.GitHubPrincipal.ADMIN_ROLE;
 import static ca.bc.gov.gwa.servlet.authentication.GitHubPrincipal.DEVELOPER_ROLE;
 import java.io.IOException;
 import java.security.Principal;

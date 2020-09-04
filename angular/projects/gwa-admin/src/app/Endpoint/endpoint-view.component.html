@@ -6,6 +6,11 @@
           <mat-form-field class="flexField">
             <input matInput placeholder="Name" name="name" [(ngModel)]="object.name" required pattern="[a-zA-Z][a-zA-Z0-9_\-]*" />
           </mat-form-field>
+          <mat-form-field class="flexField">
+            <mat-chip-list #tagList>
+              <mat-chip *ngFor="let tag of object.tags">{{tag}}</mat-chip>
+            </mat-chip-list>
+          </mat-form-field>
           <mat-form-field class="flexField" *ngIf="object.created_at">
             <input matInput placeholder="Created At" value="{{object.created_at | date:'yyyy-MM-dd HH:mm:ss'}}" disabled />
           </mat-form-field>
@@ -20,7 +25,7 @@
           </mat-form-field>
           <mat-form-field class="flexField">
             <mat-chip-list #uriList>
-              <mat-chip *ngFor="let uri of object.uris">{{uri}}</mat-chip>
+              <mat-chip *ngFor="let uri of object.paths">{{uri}}</mat-chip>
               <input placeholder="Paths" [matChipInputFor]="uriList" readonly />
             </mat-chip-list>
           </mat-form-field>
@@ -73,8 +78,8 @@
       </mat-card-content>
         <mat-card-actions>
           <button (click)="routeList()" mat-button>Close</button>
-          <button (click)="save(false)" mat-raised-button color="accent" [disabled]="!endpointForm.form.valid" *ngIf="object.id">Save</button>
-          <button (click)="save(true)" mat-raised-button color="primary" [disabled]="!endpointForm.form.valid">Save &amp; Close</button>
+<!--          <button (click)="save(false)" mat-raised-button color="accent" [disabled]="!endpointForm.form.valid" *ngIf="object.id">Save</button>
+          <button (click)="save(true)" mat-raised-button color="primary" [disabled]="!endpointForm.form.valid">Save &amp; Close</button>-->
       </mat-card-actions>
     </mat-card>
   </form>

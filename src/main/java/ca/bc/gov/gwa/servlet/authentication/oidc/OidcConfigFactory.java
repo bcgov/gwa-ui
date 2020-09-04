@@ -25,13 +25,15 @@ public class OidcConfigFactory implements ConfigFactory {
         oidcConfiguration.setClientId(settings.getOidcClientId());
         oidcConfiguration.setSecret(settings.getOidcClientSecret());
         oidcConfiguration.setUseNonce(true);
+        
         //oidcClient.setPreferredJwsAlgorithm(JWSAlgorithm.RS256);
         //oidcConfiguration.addCustomParam("prompt", "consent");
 
         final KeycloakOidcClient kcClient = new KeycloakOidcClient(oidcConfiguration);
-              
+
         final Clients clients = new Clients(settings.getOidcCallbackUrl(), kcClient);
 
+        clients.setAjaxRequestResolver(new CustomAjaxRequestResolver());
         final Config config = new Config(clients);
 
         DefaultSecurityLogic.INSTANCE.setAuthorizationChecker(new CustomDefaultAuthorizationChecker());

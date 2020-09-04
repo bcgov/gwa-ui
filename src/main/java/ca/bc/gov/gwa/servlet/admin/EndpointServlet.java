@@ -22,9 +22,9 @@ public class EndpointServlet extends BaseServlet {
   protected void doDelete(final HttpServletRequest request, final HttpServletResponse response)
     throws ServletException, IOException {
     final List<String> paths = splitPathInfo(request);
-    if (!this.apiService.endpointAccessAllowed(request, response, paths)) {
-      return;
-    }
+    //if (!this.apiService.endpointAccessAllowed(request, response, paths)) {
+    //  return;
+    //}
 
     if (paths.size() == 5 && GROUPS.equals(paths.get(1)) && USERS.equals(paths.get(3))) {
       final String apiName = paths.get(0);
@@ -45,15 +45,15 @@ public class EndpointServlet extends BaseServlet {
   protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
     throws ServletException, IOException {
     final List<String> paths = splitPathInfo(request);
-    if (!this.apiService.endpointAccessAllowed(request, response, paths)) {
-      return;
-    }
+    //if (!this.apiService.endpointAccessAllowed(request, response, paths)) {
+    //  return;
+    //}
     switch (paths.size()) {
       case 0:
         doGetEndpointList(request, response);
       break;
       case 1:
-        doGetEndpoint(response, paths);
+        doGetEndpoint(request, response, paths);
       break;
 
       case 4:
@@ -71,30 +71,29 @@ public class EndpointServlet extends BaseServlet {
     }
   }
 
-  private void doGetEndpoint(final HttpServletResponse response, final List<String> paths) {
+  private void doGetEndpoint(final HttpServletRequest request, final HttpServletResponse response, final List<String> paths) throws IOException {
     final String apiName = paths.get(0);
-    this.apiService.apiGet(response, apiName);
+    this.apiService.endpointItem(request, response, apiName);
   }
 
   private void doGetEndpointList(final HttpServletRequest request,
-    final HttpServletResponse response) {
+    final HttpServletResponse response) throws IOException {
     this.apiService.endpointList(request, response);
   }
 
   private void doGetGroupUserList(final HttpServletRequest request,
-    final HttpServletResponse response, final List<String> paths, final String apiName) {
+    final HttpServletResponse response, final List<String> paths, final String apiName) throws IOException {
     final String groupName = paths.get(2);
-    System.out.println("Getting " + groupName);
-    this.apiService.endpointGroupUserList(request, response, apiName, groupName);
+    this.apiService.groupUserList(request, response, groupName);
   }
 
   @Override
   protected void doPost(final HttpServletRequest request, final HttpServletResponse response)
     throws ServletException, IOException {
     final List<String> paths = splitPathInfo(request);
-    if (!this.apiService.endpointAccessAllowed(request, response, paths)) {
-      return;
-    }
+    //if (!this.apiService.endpointAccessAllowed(request, response, paths)) {
+    //  return;
+    //}
     if (paths.size() == 5 && GROUPS.equals(paths.get(1)) && USERS.equals(paths.get(3))) {
       doPostGroupUserAdd(response, paths);
     } else {

@@ -15,13 +15,13 @@
     </layout>
   </appender>
 
-<!--  <logger name="ca.bc.gov" additivity="false">
+  <logger name="ca.bc.gov" additivity="false">
         <level value="DEBUG" />
         <appender-ref ref="ConsoleLog" />
-  </logger>-->
+  </logger>
 
   <root>
-    <level value="DEBUG" />
+    <level value="INFO" />
     <appender-ref ref="ConsoleLog" />
   </root>
 </log4j:configuration>

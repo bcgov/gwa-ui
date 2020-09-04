@@ -133,11 +133,11 @@ const routes: Routes = [
       {path: 'groups', component: EndpointGroupListComponent, pathMatch: 'full'},
     ]
   },
+  {path: 'ui/groups', component: GroupListComponent },
+  {path: 'ui/groups/:groupName', component: GroupUserListComponent },
+
   {path: 'ui/endpoints/:apiName/groups/:groupName', component: EndpointGroupUserListComponent},
-
-  {path: 'ui/groups', component: GroupListComponent, canActivate: [RoleGuard], data: {roles: ['gwa_admin']}},
-  {path: 'ui/groups/:groupName', component: GroupUserListComponent, canActivate: [RoleGuard], data: {roles: ['gwa_admin']}},
-
+  
   {path: 'ui/plugins', component: PluginNameListComponent, canActivate: [RoleGuard], data: {roles: ['gwa_admin']}},
   {path: 'ui/plugins/:pluginName', component: PluginListComponent, canActivate: [RoleGuard], data: {roles: ['gwa_admin']}},
 

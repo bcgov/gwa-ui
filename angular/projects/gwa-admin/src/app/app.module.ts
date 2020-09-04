@@ -127,10 +127,10 @@ import {AdminRoutingModule} from './admin-routing.module';
 
     RevolsysAngularBcgovPageModule.forRoot({
       basePath: '/int',
-      title: 'Gateway Admin',
+      title: 'API Services Portal',
       headerMenuItems: [
         {
-          title: 'Endpoints',
+          title: 'Services',
           routerLink: 'ui/endpoints'
         },
         {

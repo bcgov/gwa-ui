@@ -15,12 +15,13 @@ import javax.servlet.annotation.WebFilter;
 import javax.servlet.annotation.WebInitParam;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import org.pac4j.jee.filter.SecurityFilter;
 
-@WebFilter(urlPatterns = {
-        "/me",
+@WebFilter(
+    urlPatterns = {
         "/git/*", "/logout", "/rest/*", "/ui/*",
-        "/int/ui/*", "/int/rest/*", "/int/logout", "/int/login/*"
+        "/int/ui/*", "/int/rest/*", "/int/logout", "/int/login/*", "/int/authz/request"
     },
     initParams = {
         @WebInitParam(name = "configFactory", value = "ca.bc.gov.gwa.servlet.authentication.oidc.OidcConfigFactory"),
@@ -28,7 +29,29 @@ import org.pac4j.jee.filter.SecurityFilter;
     }
 )
 public class OidcSecurityFilter extends SecurityFilter {
+
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        super.doFilter(request, response, chain);
-    }    
+        final String servletPath = ((HttpServletRequest) request).getServletPath();
+
+        final HttpSession session = ((HttpServletRequest)request).getSession(false);
+//        if (session == null) {
+//            HttpServletResponse resp = ((HttpServletResponse)response);
+//            resp.sendError(401);
+//        }
+        //if ("/logout".equals(servletPath)) {
+        //} else {
+            super.doFilter(request, response, chain);
+        //}
+    }
+
+//    private void doFilterLogout(final HttpServletRequest httpRequest,
+//            final HttpServletResponse httpResponse) throws IOException {
+//        final HttpSession session = httpRequest.getSession(false);
+//        if (session != null) {
+//            session.invalidate();
+//        }
+//
+//        String url = "";
+//        httpResponse.sendRedirect(url);
+//    }
 }

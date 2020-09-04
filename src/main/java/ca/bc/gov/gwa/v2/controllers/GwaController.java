@@ -23,6 +23,7 @@ import ca.bc.gov.gwa.util.Json;
 import ca.bc.gov.gwa.util.LruMap;
 import ca.bc.gov.gwa.v2.conf.GwaSettings;
 import ca.bc.gov.gwa.v2.services.KongAdminService;
+import ca.bc.gov.gwa.v2.services.PermissionService;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.LinkedHashMap;
@@ -43,7 +44,7 @@ import org.slf4j.LoggerFactory;
 public class GwaController implements ServletContextListener, GwaConstants {
   private final Map<String, String> apiNameById = new LruMap<>(1000);
 
-  static String API_SERVICE_NAME = GwaController.class.getName();
+  public static String GWA_CONTROLLER = GwaController.class.getName();
 
   public static final Logger LOG = LoggerFactory.getLogger(GwaController.class);
 
@@ -51,7 +52,16 @@ public class GwaController implements ServletContextListener, GwaConstants {
   final GwaSettings config = new GwaSettings();
   
   KongAdminService kongAdminService = new KongAdminService (config);
+  PermissionService permissionService = new PermissionService (config);
   
+  public KongAdminService getKongAdminService() {
+      return kongAdminService;
+  }
+  
+  public PermissionService getPermissionService() {
+      return permissionService;
+  }
+
   @Override
   public void contextDestroyed(final ServletContextEvent event) {
     //this.apiNameById.clear();
@@ -62,7 +72,7 @@ public class GwaController implements ServletContextListener, GwaConstants {
     //
     try {
       final ServletContext servletContext = event.getServletContext();
-      servletContext.setAttribute(API_SERVICE_NAME, this);
+      servletContext.setAttribute(GWA_CONTROLLER, this);
     } catch (final Exception e) {
       LOG.error("Unable to initialize service", e);
       throw e;
@@ -118,7 +128,7 @@ public class GwaController implements ServletContextListener, GwaConstants {
       Json.writeJson(httpResponse, response);
     });
   }
-
+/*
   public void handleListAll(final HttpServletRequest httpRequest,
     final HttpServletResponse httpResponse, final String path,
     final Predicate<Map<String, Object>> filter) {
@@ -127,6 +137,7 @@ public class GwaController implements ServletContextListener, GwaConstants {
       Json.writeJson(httpResponse, response);
     });
   }
+*/
 
   public void handleRequest(final HttpServletResponse httpResponse, final JsonHttpConsumer action) {
     final JsonHttpFunction function = action;
