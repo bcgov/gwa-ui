@@ -5,6 +5,8 @@
  */
 package ca.bc.gov.gwa.authz;
 
+import java.util.List;
+import java.util.Map;
 import javax.ws.rs.core.Response;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
@@ -47,6 +49,8 @@ public class TestAdmin {
         };
         GroupRepresentation gr = new GroupRepresentation();
         gr.setName("abce");
+        Map<String, List<String>> attrs = gr.getAttributes();
+        
 
 //        team.getSubGroups().add(gr);
         

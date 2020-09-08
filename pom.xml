@@ -342,7 +342,11 @@
 	<artifactId>jackson-databind</artifactId>
 	<version>2.9.8</version>
     </dependency>
-    
+    <dependency>
+        <groupId>com.fasterxml.jackson.dataformat</groupId>
+        <artifactId>jackson-dataformat-yaml</artifactId>
+        <version>2.9.8</version>
+    </dependency>    
   </dependencies>
 
   <profiles>
@@ -422,7 +426,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <org.slf4j.version>1.7.21</org.slf4j.version>
-    <skip.frontend>false</skip.frontend>
+    <skip.frontend>true</skip.frontend>
     <cargo.servlet.port>8010</cargo.servlet.port>
     <cargo.rmi.port>8011</cargo.rmi.port>
     <cargo.start.jvmargs></cargo.start.jvmargs>

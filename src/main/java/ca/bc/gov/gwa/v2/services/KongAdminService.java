@@ -169,7 +169,7 @@ public class KongAdminService {
     
     public List<Service> filterServicesByPermissions (Collection<Service> services, UserProfile profile) {
         String team = String.format("#%s", profile.getAttribute("team"));
-        if (team == null) {
+        if (profile.getAttribute("team") == null) {
             return new ArrayList<>();
         } else {
             return services.stream()

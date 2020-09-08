@@ -5,6 +5,7 @@
  */
 package ca.bc.gov.gwa.servlet.authentication.oidc;
 
+import com.nimbusds.oauth2.sdk.token.BearerAccessToken;
 import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -26,6 +27,7 @@ public class LookupUtil {
         Optional<CommonProfile> profile = profileManager.get(true);
 
         if (profile.isPresent()) {
+            System.out.println("BEARER = " + profile.get().getAttribute("access_token", BearerAccessToken.class));
             return profile.get();
         } else {
             return null;

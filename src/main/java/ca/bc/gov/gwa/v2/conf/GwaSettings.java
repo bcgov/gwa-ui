@@ -50,6 +50,16 @@ public class GwaSettings {
     
     private String oidcCallbackUrl;
     
+    private String apiKey;
+    
+    private String keycloakUrl;
+    
+    private String keycloakRealm;
+    
+    private String keycloakUsername;
+    
+    private String keycloakPassword;
+    
 
     public Map<String, Object> getConfig() {
         return config;
@@ -114,6 +124,28 @@ public class GwaSettings {
     public String getOidcCallbackUrl() {
         return oidcCallbackUrl;
     }
+
+    public String getApiKey() {
+        return apiKey;
+    }
+
+    public String getKeycloakUrl() {
+        return keycloakUrl;
+    }
+
+    public String getKeycloakRealm() {
+        return keycloakRealm;
+    }
+
+    public String getKeycloakUsername() {
+        return keycloakUsername;
+    }
+
+    public String getKeycloakPassword() {
+        return keycloakPassword;
+    }
+    
+    
     
     public GwaSettings() {
         try {
@@ -135,6 +167,13 @@ public class GwaSettings {
             this.oidcClientSecret = getConfig("oidcClientSecret");
             this.oidcCallbackUrl = getConfig("oidcCallbackUrl");
 
+            this.apiKey = getConfig("apiKey");
+
+            this.keycloakUrl = getConfig("keycloakUrl");
+            this.keycloakRealm = getConfig("keycloakRealm");
+            this.keycloakUsername = getConfig("keycloakUsername");
+            this.keycloakPassword = getConfig("keycloakPassword");
+            
             if (this.oidcClientId == null || this.oidcClientSecret == null) {
                 LoggerFactory.getLogger(getClass())
                         .error("Missing oidc client configuration");
