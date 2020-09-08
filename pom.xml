@@ -426,7 +426,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <org.slf4j.version>1.7.21</org.slf4j.version>
-    <skip.frontend>true</skip.frontend>
+    <skip.frontend>false</skip.frontend>
     <cargo.servlet.port>8010</cargo.servlet.port>
     <cargo.rmi.port>8011</cargo.rmi.port>
     <cargo.start.jvmargs></cargo.start.jvmargs>
