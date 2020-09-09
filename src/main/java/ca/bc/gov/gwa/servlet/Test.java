@@ -44,7 +44,6 @@ import org.bouncycastle.util.io.pem.PemReader;
 
 /**
  *
- * @author aidancope
  */
 public class Test {
             public static int AES_KEY_SIZE = 256 ;

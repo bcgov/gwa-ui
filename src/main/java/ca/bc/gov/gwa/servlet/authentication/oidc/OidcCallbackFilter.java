@@ -42,9 +42,9 @@ public class OidcCallbackFilter extends CallbackFilter {
 
         if (profile != null) {
             // Auto-register the Consumer on Kong
-            System.out.println("Auto Reg " + profile.getId() + " : " + profile.getUsername());
-            System.out.println("IDIR GUID = "+profile.getAttribute("idir_userid"));
-            Json.toString(profile);
+            //System.out.println("Auto Reg " + profile.getId() + " : " + profile.getUsername());
+            //System.out.println("IDIR GUID = "+profile.getAttribute("idir_userid"));
+            //Json.toString(profile);
             
             String userId = profile.getId();
             String username = profile.getUsername();

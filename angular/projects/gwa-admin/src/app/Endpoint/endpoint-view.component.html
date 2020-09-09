@@ -6,11 +6,6 @@
           <mat-form-field class="flexField">
             <input matInput placeholder="Name" name="name" [(ngModel)]="object.name" required pattern="[a-zA-Z][a-zA-Z0-9_\-]*" />
           </mat-form-field>
-          <mat-form-field class="flexField">
-            <mat-chip-list #tagList>
-              <mat-chip *ngFor="let tag of object.tags">{{tag}}</mat-chip>
-            </mat-chip-list>
-          </mat-form-field>
           <mat-form-field class="flexField" *ngIf="object.created_at">
             <input matInput placeholder="Created At" value="{{object.created_at | date:'yyyy-MM-dd HH:mm:ss'}}" disabled />
           </mat-form-field>
@@ -31,17 +26,23 @@
           </mat-form-field>
         </div>
 
-        <div class="flexRowToColumn" *ngIf="endpoint.config['api_owners'].length > 0">
+        <div class="flexRowToColumn">
           <mat-form-field class="flexField">
             <mat-chip-list #apiOwnerList>
               <mat-chip *ngFor="let apiOwner of endpoint.config['api_owners']">{{apiOwner}}</mat-chip>
-              <input placeholder="Owner Usernames" [matChipInputFor]="apiOwnerList" readonly />
+              <input placeholder="Owners" [matChipInputFor]="apiOwnerList" readonly />
+            </mat-chip-list>
+          </mat-form-field>
+          <mat-form-field class="flexField">
+            <mat-chip-list #tagList>
+              <mat-chip *ngFor="let tag of object.tags">{{tag}}</mat-chip>
+              <input placeholder="Tags" [matChipInputFor]="tagList" readonly />
             </mat-chip-list>
           </mat-form-field>
         </div>
 
         <div class="flexRowToColumn">
-          <mat-slide-toggle class="flexField" name="keyAuth_enabled" [checked]="keyAuth && keyAuth.enabled" color="primary">Allow Developer Keys</mat-slide-toggle>
+          <mat-slide-toggle class="flexField" name="keyAuth_enabled" [checked]="keyAuth && keyAuth.enabled" color="primary" disabled>Allow Developer Keys</mat-slide-toggle>
         </div>
 
         <div class="flexRowToColumn">

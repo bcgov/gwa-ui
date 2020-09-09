@@ -16,7 +16,6 @@ import org.apache.logging.log4j.util.Strings;
 
 /**
  *
- * @author aidancope
  */
 public class TestAuth {
     @Setter

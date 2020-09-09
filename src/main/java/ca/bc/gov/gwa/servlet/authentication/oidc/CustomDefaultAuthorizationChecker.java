@@ -15,12 +15,11 @@ import org.pac4j.core.profile.UserProfile;
 
 /**
  *
- * @author aidancope
  */
 public class CustomDefaultAuthorizationChecker extends DefaultAuthorizationChecker {
 
     @Override
-    public boolean isAuthorized(WebContext wc, List<UserProfile> list, String string, Map<String, Authorizer> map) {
+    public boolean isAuthorized(WebContext wc, List<UserProfile> profiles, String authorizersValue, Map<String, Authorizer> authorizersMap) {
         return  true;
     }
     

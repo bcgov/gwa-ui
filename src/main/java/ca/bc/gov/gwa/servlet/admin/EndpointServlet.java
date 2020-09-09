@@ -22,9 +22,9 @@ public class EndpointServlet extends BaseServlet {
   protected void doDelete(final HttpServletRequest request, final HttpServletResponse response)
     throws ServletException, IOException {
     final List<String> paths = splitPathInfo(request);
-    //if (!this.apiService.endpointAccessAllowed(request, response, paths)) {
-    //  return;
-    //}
+    if (!this.apiService.endpointAccessAllowed(request, response, paths)) {
+      return;
+    }
 
     if (paths.size() == 5 && GROUPS.equals(paths.get(1)) && USERS.equals(paths.get(3))) {
       final String apiName = paths.get(0);
@@ -45,9 +45,9 @@ public class EndpointServlet extends BaseServlet {
   protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
     throws ServletException, IOException {
     final List<String> paths = splitPathInfo(request);
-    //if (!this.apiService.endpointAccessAllowed(request, response, paths)) {
-    //  return;
-    //}
+    if (!this.apiService.endpointAccessAllowed(request, response, paths)) {
+      return;
+    }
     switch (paths.size()) {
       case 0:
         doGetEndpointList(request, response);
@@ -91,9 +91,9 @@ public class EndpointServlet extends BaseServlet {
   protected void doPost(final HttpServletRequest request, final HttpServletResponse response)
     throws ServletException, IOException {
     final List<String> paths = splitPathInfo(request);
-    //if (!this.apiService.endpointAccessAllowed(request, response, paths)) {
-    //  return;
-    //}
+    if (!this.apiService.endpointAccessAllowed(request, response, paths)) {
+      return;
+    }
     if (paths.size() == 5 && GROUPS.equals(paths.get(1)) && USERS.equals(paths.get(3))) {
       doPostGroupUserAdd(response, paths);
     } else {

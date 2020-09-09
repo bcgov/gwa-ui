@@ -747,16 +747,19 @@ public class ApiService implements ServletContextListener, GwaConstants {
 
     public boolean endpointAccessAllowed(final HttpServletRequest httpRequest,
             final HttpServletResponse httpResponse, final List<String> paths) {
+
         if (paths.isEmpty()) {
             return true;
         } else {
             final Principal principal = httpRequest.getUserPrincipal();
 
+            final UserProfile user = LookupUtil.lookupUserProfile(httpRequest, httpResponse);
+
             //final BasePrincipal principal = (BasePrincipal)httpRequest.getUserPrincipal();
             //if (principal.isUserInRole(ROLE_GWA_ADMIN)) {
             //  return true;
             //} else {
-            return endpointAccessAllowedApiOwner(httpResponse, paths, principal);
+            return endpointAccessAllowedApiOwner(httpResponse, paths, user);
             //}
 
         }
@@ -764,17 +767,20 @@ public class ApiService implements ServletContextListener, GwaConstants {
 
     @SuppressWarnings("unchecked")
     private boolean endpointAccessAllowedApiOwner(final HttpServletResponse httpResponse,
-            final List<String> paths, final Principal principal) {
+            final List<String> paths, final UserProfile user) {
+        
+        String teams = (String) user.getAttribute("team");
+        
+        String team = String.format("#%s", teams);
         if (this.useEndpoints) {
             final String endpointName = paths.get(0);
             final Map<String, Object> api = apiGet(endpointName, true, false);
             if (api != null) {
-                final String username = principal.getName();
                 final Map<String, Object> endPoint = pluginGet(api, BCGOV_GWA_ENDPOINT);
                 if (endPoint != null) {
                     final Map<String, Object> config = (Map<String, Object>) endPoint.get(CONFIG);
                     final List<String> apiOwners = getList(config, API_OWNERS);
-                    if (apiOwners.contains(username)) {
+                    if (apiOwners.contains(team)) {
                         return true;
                     }
                 }
