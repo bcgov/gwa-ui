@@ -43,7 +43,6 @@ import org.slf4j.LoggerFactory;
 public class TeamService {
     public static final Logger LOG = LoggerFactory.getLogger(TeamService.class);
     
-    static final String REALM_GW = "gwa";
     static final String ROOT_GROUP_NAME = "team";
     static final String ATTR_FOR_PENDING = "pending";
             
@@ -64,14 +63,28 @@ public class TeamService {
         
         Keycloak cl = Keycloak.getInstance(config.getKeycloakUrl(), config.getKeycloakRealm(), config.getKeycloakUsername(), config.getKeycloakPassword(), "admin-cli");
 
-        RealmResource realm = cl.realm(REALM_GW);
+        RealmResource realm = cl.realm(config.getOidcRealm());
 
+        GroupRepresentation root = null;
         Optional<GroupRepresentation> optRoot = realm.groups().groups().stream().filter(g -> g.getName().equals(ROOT_GROUP_NAME)).findFirst();
         if (!optRoot.isPresent()) {
-            throw new IllegalArgumentException("Group not found " + ROOT_GROUP_NAME);
-        }
+            GroupRepresentation gr = new GroupRepresentation();
+            gr.setName(ROOT_GROUP_NAME);
+            Map<String, List<String>> attrs = gr.getAttributes();
+            Response resp = realm.groups().add(gr);
 
-        GroupRepresentation root = optRoot.get();
+            LOG.info(resp.getStatusInfo().getReasonPhrase());
+            if (resp.hasEntity()) {
+                GroupRepresentation addedGroup = (GroupRepresentation) resp.readEntity(GroupRepresentation.class);
+                LOG.info("Group added " + addedGroup.getName());
+                root = addedGroup;
+            } else {
+                throw new IllegalArgumentException("Root group not able to be created.");
+            }
+            
+        } else {
+            root = optRoot.get();
+        }
         
         List<GroupRepresentation> groups = root.getSubGroups();
         
