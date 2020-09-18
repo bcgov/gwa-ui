@@ -51,7 +51,9 @@ public class LogoutFilter extends AbstractConfigFilter {
             clientId = "KeycloakOidcClient";
         }
 
-        String targetUrl = "http://localhost:8080/int";
+        
+        String targetUrl = request.getRequestURL().toString().replace("/logout", "");
+        logger.debug(targetUrl);
         
         final JEEContext context = new JEEContext(request, response);
         
