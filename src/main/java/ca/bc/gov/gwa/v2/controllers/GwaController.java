@@ -22,6 +22,7 @@ import ca.bc.gov.gwa.servlet.admin.ImportServlet;
 import ca.bc.gov.gwa.util.Json;
 import ca.bc.gov.gwa.util.LruMap;
 import ca.bc.gov.gwa.v2.conf.GwaSettings;
+import ca.bc.gov.gwa.v2.services.GwaApiService;
 import ca.bc.gov.gwa.v2.services.KongAdminService;
 import ca.bc.gov.gwa.v2.services.PermissionService;
 import ca.bc.gov.gwa.v2.services.TeamService;
@@ -55,6 +56,7 @@ public class GwaController implements ServletContextListener, GwaConstants {
     KongAdminService kongAdminService = new KongAdminService(config);
     PermissionService permissionService = new PermissionService(config);
     TeamService teamService = new TeamService(config);
+    GwaApiService gwaApiService = new GwaApiService(config);
 
     public KongAdminService getKongAdminService() {
         return kongAdminService;
@@ -66,6 +68,10 @@ public class GwaController implements ServletContextListener, GwaConstants {
 
     public TeamService getTeamService() {
         return teamService;
+    }
+
+    public GwaApiService getGwaApiService() {
+        return gwaApiService;
     }
 
     @Override

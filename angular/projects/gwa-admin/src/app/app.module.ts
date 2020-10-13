@@ -74,6 +74,10 @@ import {ServiceAccountListComponent} from './ServiceAccount/service-account-list
 import {ServiceAccountService} from './ServiceAccount/service-account.service';
 import { RegDialogComponent} from './ServiceAccount/regen-dialog';
 
+import {NamespaceService} from './Namespace/namespace.service';
+import {NamespaceViewComponent} from './Namespace/namespace-view.component';
+import { NewNamespaceDialogComponent} from './Namespace/new-dialog';
+
 import {EndpointViewTabsComponent} from './Endpoint/endpoint-view-tabs.component';
 import {EndpointViewComponent} from './Endpoint/endpoint-view.component';
 import {EndpointListComponent} from './Endpoint/endpoint-list.component';
@@ -84,6 +88,7 @@ import {EndpointGroupListComponent} from './Endpoint/Group/endpoint-group-list.c
 
 import {EndpointGroupUserListComponent} from './Endpoint/Group/endpoint-group-user-list.component';
 import {EndpointGroupUserService} from './Endpoint/Group/endpoint-group-user.service';
+
 
 import {GroupUserListComponent} from './Group/group-user-list.component';
 import {GroupUserService} from './Group/group-user.service';
@@ -142,30 +147,8 @@ import {AdminRoutingModule} from './admin-routing.module';
             routerLink: 'ui/serviceAccounts'
         },
         {
-          title: 'APIs',
-          routerLink: 'ui/apis'
-        },
-        {
-          title: 'Plugins',
-          routerLink: 'ui/plugins'
-        },
-        {
-          title: 'Users',
-          icon: 'person',
-          routerLink: 'ui/users'
-        },
-        {
-          title: 'Groups',
-          icon: 'people',
-          routerLink: 'ui/groups'
-        },
-        {
-          title: 'Status',
-          routerLink: 'ui/status'
-        },
-        {
-          title: 'Import/Export',
-          routerLink: 'ui/importExport'
+            title: 'Namespaces',
+            routerLink: 'ui/namespaces'
         }
       ]
     }
@@ -178,7 +161,8 @@ import {AdminRoutingModule} from './admin-routing.module';
   ],
   entryComponents: [
     ImportExportViewComponent,
-    RegDialogComponent
+    RegDialogComponent,
+    NewNamespaceDialogComponent
   ],
   declarations: [
     AdminComponent,
@@ -223,7 +207,9 @@ import {AdminRoutingModule} from './admin-routing.module';
     ImportExportViewComponent,
 
     ServiceAccountListComponent,
-    RegDialogComponent
+    NamespaceViewComponent,
+    RegDialogComponent,
+    NewNamespaceDialogComponent
 
   ],
   providers: [
@@ -248,6 +234,7 @@ import {AdminRoutingModule} from './admin-routing.module';
     EndpointResolver,
     EndpointService,
     ServiceAccountService,
+    NamespaceService,
     GroupService,
     GroupUserService,
     PluginService,

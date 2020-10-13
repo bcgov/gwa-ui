@@ -1,5 +1,6 @@
 package ca.bc.gov.gwa.servlet.admin;
 
+import ca.bc.gov.gwa.http.HttpStatusException;
 import java.io.IOException;
 import java.util.List;
 
@@ -12,8 +13,11 @@ import ca.bc.gov.gwa.servlet.BaseServlet;
 import static ca.bc.gov.gwa.servlet.GwaConstants.DATA;
 import static ca.bc.gov.gwa.servlet.GwaConstants.DELETED;
 import static ca.bc.gov.gwa.servlet.GwaConstants.TOTAL;
+import static ca.bc.gov.gwa.servlet.GwaConstants.UNKNOWN_APPLICATION_ERROR;
 import ca.bc.gov.gwa.servlet.authentication.oidc.LookupUtil;
 import ca.bc.gov.gwa.util.Json;
+import ca.bc.gov.gwa.v1.ApiService;
+import ca.bc.gov.gwa.v2.controllers.GwaController;
 import ca.bc.gov.gwa.v2.model.Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
@@ -24,7 +28,10 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
+import org.pac4j.core.profile.CommonProfile;
 
+@Slf4j
 @WebServlet(urlPatterns = "/int/rest/serviceAccounts/*", loadOnStartup = 1)
 public class ServiceAccountsServlet extends BaseServlet {
   private static final long serialVersionUID = 1L;
@@ -68,13 +75,20 @@ public class ServiceAccountsServlet extends BaseServlet {
     throws ServletException, IOException {
     final List<String> paths = splitPathInfo(request);
 
-    Map<String, Object> apiResponse = new HashMap<>();
-    apiResponse.put("key","ns-sampler");
-    apiResponse.put("secret",UUID.randomUUID().toString());
-    apiResponse.put("scope", Arrays.asList("admin:acl", "admin:gateway", "admin:catalog"));
-   
-    Json.writeJson(response, apiResponse);
+    CommonProfile profile = LookupUtil.lookupUserProfile(request, response);
     
+    String ns = LookupUtil.getNamespaceClaim(profile);
+
+    GwaController cc = ApiService.getGwaController(request.getServletContext());
+
+    List<String> scopes = Arrays.asList("admin:acl", "admin:gateway", "admin:catalog");
+    
+    try {
+        cc.getGwaApiService().createServiceAccount(profile, ns, scopes);
+    } catch (HttpStatusException ex) {
+        apiService.writeJsonError(response, ex.getMessage(), ex);
+    }
+    Json.writeJson(response, Collections.emptyMap());
   }
 
   @Override
@@ -88,7 +102,7 @@ public class ServiceAccountsServlet extends BaseServlet {
     apiResponse.put("scope", Arrays.asList("admin:acl", "admin:gateway", "admin:catalog"));
    
     Json.writeJson(response, apiResponse);
-    
+
   }
   
 //  private void doGetEndpoint(final HttpServletRequest request, final HttpServletResponse response, final List<String> paths) throws IOException {

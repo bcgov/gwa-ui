@@ -39,6 +39,8 @@ public class AuthenticationServlet extends BaseServlet {
       data.put("name", gwaPrincipal.getName());
       Set<String> roles = new HashSet();
       roles.add(DEVELOPER_ROLE);
+      roles.add(ADMIN_ROLE);
+      
       
       data.put("roles", roles);
       

@@ -37,6 +37,7 @@ import {UserGroupListComponent} from './User/Group/user-group-list.component';
 import {UserPluginListComponent} from './User/Plugin/user-plugin-list.component';
 
 import {ServiceAccountListComponent} from './ServiceAccount/service-account-list.component';
+import {NamespaceViewComponent} from './Namespace/namespace-view.component';
 
 import {EndpointListComponent} from './Endpoint/endpoint-list.component';
 import {EndpointViewTabsComponent} from './Endpoint/endpoint-view-tabs.component';
@@ -61,70 +62,6 @@ const routes: Routes = [
   {path: '', redirectTo: 'ui/endpoints', pathMatch: 'full'},
   {path: 'ui', redirectTo: 'ui/endpoints', pathMatch: 'full'},
 
-  {path: 'ui/apis', component: ApiListComponent, canActivate: [RoleGuard], data: {roles: ['gwa_admin']}},
-  {path: 'ui/apis/_add_', component: ApiAddComponent, pathMatch: 'full', canActivate: [RoleGuard], data: {roles: ['gwa_admin']}},
-  {
-    path: 'ui/apis/:apiName',
-    component: ApiViewTabsComponent,
-    canActivate: [RoleGuard],
-    data: {roles: ['gwa_admin']},
-    resolve: {api: ApiResolver},
-    children: [
-      {path: '', component: ApiViewComponent, pathMatch: 'full'},
-      {path: 'plugins', component: ApiPluginListComponent, pathMatch: 'full'},
-      {path: 'groups', component: ApiGroupListComponent, pathMatch: 'full'},
-    ]
-  },
-  {path: 'ui/apis/:apiName/groups/:groupName', component: ApiGroupUserListComponent},
-  {
-    path: 'ui/apis/:apiName/plugins/:pluginName',
-    component: ApiPluginViewComponent,
-    canActivate: [RoleGuard],
-    data: {roles: ['gwa_admin']},
-    resolve: {plugin: ApiPluginResolver}
-  },
-
-  {
-    path: 'ui/apis/:apiName/plugins/:pluginName/users',
-    component: ApiPluginUserListComponent,
-    canActivate: [RoleGuard],
-    data: {roles: ['gwa_admin']},
-    resolve: {api: ApiResolver}
-  },
-
-  {
-    path: 'ui/apis/:apiName/plugins/:pluginName/users/:username',
-    component: ApiPluginUserViewComponent,
-    canActivate: [RoleGuard],
-    data: {roles: ['gwa_admin']},
-    resolve: {plugin: ApiPluginUserResolver}
-  },
-
-  {path: 'ui/users', component: UserListComponent, canActivate: [RoleGuard], data: {roles: ['gwa_admin']}},
-  {path: 'ui/users/_add_', component: UserAddComponent, pathMatch: 'full', canActivate: [RoleGuard], data: {roles: ['gwa_admin']}},
-  {
-    path: 'ui/users/:username',
-    component: UserDetailComponent,
-    canActivate: [RoleGuard],
-    data: {roles: ['gwa_admin']},
-    resolve: {user: UserResolver},
-    children: [
-      {path: '', component: UserViewComponent, pathMatch: 'full'},
-      {path: 'data', component: UserDataNameListComponent, pathMatch: 'full'},
-      {path: 'groups', component: UserGroupListComponent, pathMatch: 'full'},
-      {path: 'plugins', component: UserPluginListComponent, pathMatch: 'full'},
-    ]
-  },
-
-  {path: 'ui/users/:username/data/:dataName', component: UserDataListTabsComponent, canActivate: [RoleGuard], data: {roles: ['gwa_admin']}},
-
-  {
-    path: 'ui/users/:username/data/:dataName/:id',
-    component: UserDataViewTabsComponent,
-    canActivate: [RoleGuard],
-    data: {roles: ['gwa_admin']}
-  },
-
   {path: 'ui/endpoints', component: EndpointListComponent},
   {
     path: 'ui/endpoints/:apiName',
@@ -135,19 +72,10 @@ const routes: Routes = [
       {path: 'groups', component: EndpointGroupListComponent, pathMatch: 'full'},
     ]
   },
-  {path: 'ui/groups', component: GroupListComponent, canActivate: [RoleGuard], data: {roles: ['gwa_admin']} },
-  {path: 'ui/groups/:groupName', component: GroupUserListComponent, canActivate: [RoleGuard], data: {roles: ['gwa_admin']} },
-
   {path: 'ui/endpoints/:apiName/groups/:groupName', component: EndpointGroupUserListComponent},
   
-  {path: 'ui/plugins', component: PluginNameListComponent, canActivate: [RoleGuard], data: {roles: ['gwa_admin']}},
-  {path: 'ui/plugins/:pluginName', component: PluginListComponent, canActivate: [RoleGuard], data: {roles: ['gwa_admin']}},
-
-  {path: 'ui/status', component: StatusViewComponent, canActivate: [RoleGuard], data: {roles: ['gwa_admin']}},
-
-  {path: 'ui/importExport', component: ImportExportComponent, canActivate: [RoleGuard], data: {roles: ['gwa_admin']}},
-
   {path: 'ui/serviceAccounts', component: ServiceAccountListComponent},
+  {path: 'ui/namespaces', component: NamespaceViewComponent},
 
   {path: '**', component: PageNotFoundComponent}
 ];

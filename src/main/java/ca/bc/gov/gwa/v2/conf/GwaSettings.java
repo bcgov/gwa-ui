@@ -60,6 +60,7 @@ public class GwaSettings {
     
     private String keycloakPassword;
     
+    private String gwaApiUrl;
 
     public Map<String, Object> getConfig() {
         return config;
@@ -144,6 +145,10 @@ public class GwaSettings {
     public String getKeycloakPassword() {
         return keycloakPassword;
     }
+
+    public String getGwaApiUrl() {
+        return gwaApiUrl;
+    }
     
     
     
@@ -173,6 +178,8 @@ public class GwaSettings {
             this.keycloakRealm = getConfig("keycloakRealm");
             this.keycloakUsername = getConfig("keycloakUsername");
             this.keycloakPassword = getConfig("keycloakPassword");
+
+            this.gwaApiUrl = getConfig("gwaApiUrl");
             
             if (this.oidcClientId == null || this.oidcClientSecret == null) {
                 LoggerFactory.getLogger(getClass())

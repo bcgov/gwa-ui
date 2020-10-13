@@ -33,6 +33,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 
 import ca.bc.gov.gwa.util.Json;
+import com.nimbusds.oauth2.sdk.token.BearerAccessToken;
 
 public class JsonHttpClient implements Closeable {
   private final String serviceUrl;
@@ -71,6 +72,7 @@ public class JsonHttpClient implements Closeable {
     }
   }
 
+  
   private void appendContent(final StringBuilder content, final CloseableHttpResponse response)
     throws IOException {
     try (
@@ -173,6 +175,13 @@ public class JsonHttpClient implements Closeable {
     return executeRequestJson(request, data);
   }
 
+  public Map<String, Object> post(final BearerAccessToken token, final String path, final Map<String, Object> data)
+    throws IOException {
+    final HttpPost request = new HttpPost(this.serviceUrl + path);
+    request.addHeader("Authorization", token.toAuthorizationHeader());
+    return executeRequestJson(request, data);
+  }
+  
   public Map<String, Object> put(final String path) throws IOException {
     final HttpPut httpRequest = new HttpPut(this.serviceUrl + path);
     final StringEntity updateRequestEntity = new StringEntity("", ContentType.TEXT_PLAIN);
@@ -185,4 +194,12 @@ public class JsonHttpClient implements Closeable {
     final HttpPut updateRequest = new HttpPut(this.serviceUrl + path);
     return executeRequestJson(updateRequest, data);
   }
+
+  public Map<String, Object> put(final BearerAccessToken token, final String path, final Map<String, Object> data)
+    throws IOException {
+    final HttpPut updateRequest = new HttpPut(this.serviceUrl + path);
+    updateRequest.addHeader("Authorization", token.toAuthorizationHeader());
+    return executeRequestJson(updateRequest, data);
+  }
+
 }

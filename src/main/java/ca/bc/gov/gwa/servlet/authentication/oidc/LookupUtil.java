@@ -9,15 +9,14 @@ import com.nimbusds.oauth2.sdk.token.BearerAccessToken;
 import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.pac4j.core.context.JEEContext;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.core.profile.ProfileManager;
 import org.pac4j.core.profile.UserProfile;
 
-/**
- *
- */
+@Slf4j
 public class LookupUtil {
     static public CommonProfile lookupUserProfile(HttpServletRequest request, HttpServletResponse response) {
         final WebContext webContext = new JEEContext(request, response);
@@ -31,5 +30,16 @@ public class LookupUtil {
         } else {
             return null;
         }
+    }
+    
+    static public String getNamespaceClaim (CommonProfile profile) {
+        String team = (String) profile.getAttribute("team");
+        log.debug("Lookup With Team {}", team);
+        String[] parts = team.split("/");
+        log.debug("parts = "+parts.length);
+        
+        String namespace = parts[2];
+        log.debug("Lookup Namespace {} -- {}", team, parts[2]);
+        return namespace;
     }
 }

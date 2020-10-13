@@ -1,0 +1,19 @@
+<ng-container>
+    <h1 class="mat-dialog-title" mat-dialog-title="">New namespace</h1>
+
+    <div class="mat-dialog-content">
+                              <mat-form-field class="flexField">
+                                <input matInput placeholder="Name" name="name" [(ngModel)]="name" required pattern="[a-zA-Z][a-zA-Z0-9_\-]*" />
+                              </mat-form-field>
+    </div>
+    <div class="mat-dialog-actions">
+        <button mat-raised-button="" class="mat-raised-button" (click)="closeDialog()">
+            <span class="mat-button-wrapper">Cancel</span>
+        </button>
+        <button color="warn" mat-raised-button="" style="margin-left: 10px;" class="mat-raised-button mat-warn" ng-reflect-color="warn" (click)="create()">
+            <span class="mat-button-wrapper">Create</span>
+        </button>
+    </div>
+
+</ng-container>
+
