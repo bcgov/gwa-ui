@@ -5,7 +5,7 @@
   "scripts": {
     "ng": "ng",
     "start-devkey": "ng serve gwa-devkey --port 4015 --base-href=/ng/ --deploy-url=/ng/",
-    "start-admin": "ng serve gwa-admin --port 4016 --base-href=/ng/admin/ --deploy-url=/ng/admin/",
+    "start-admin": "ng serve gwa-admin --port 4016 --base-href=/ng/admin/ --proxy-config=./proxy.json --deploy-url=/ng/admin/",
     "build-prod-devkey": "ng build gwa-devkey --prod --build-optimizer --base-href / --output-path ../target/gwa-devkey/ --progress false",
     "build-prod-admin": "ng build gwa-admin --prod --build-optimizer --base-href /int/ --output-path ../target/gwa-admin/ --progress false"
   },
@@ -41,7 +41,7 @@
     "@angular/language-service": "6.1.9",
     "@types/jasmine": "^2.8.17",
     "@types/jasminewd2": "^2.0.8",
-    "@types/node": "^10.17.30",
+    "@types/node": "^10.17.39",
     "codelyzer": "^4.5.0",
     "ng-packagr": "^4.7.1",
     "ts-node": "^7.0.1",

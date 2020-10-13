@@ -36,6 +36,8 @@ import {UserGroupListComponent} from './User/Group/user-group-list.component';
 
 import {UserPluginListComponent} from './User/Plugin/user-plugin-list.component';
 
+import {ServiceAccountListComponent} from './ServiceAccount/service-account-list.component';
+
 import {EndpointListComponent} from './Endpoint/endpoint-list.component';
 import {EndpointViewTabsComponent} from './Endpoint/endpoint-view-tabs.component';
 import {EndpointResolver} from './Endpoint/endpoint.resolver';
@@ -144,6 +146,8 @@ const routes: Routes = [
   {path: 'ui/status', component: StatusViewComponent, canActivate: [RoleGuard], data: {roles: ['gwa_admin']}},
 
   {path: 'ui/importExport', component: ImportExportComponent, canActivate: [RoleGuard], data: {roles: ['gwa_admin']}},
+
+  {path: 'ui/serviceAccounts', component: ServiceAccountListComponent},
 
   {path: '**', component: PageNotFoundComponent}
 ];

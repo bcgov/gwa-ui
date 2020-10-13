@@ -70,6 +70,10 @@ import {UserDataViewTabsComponent} from './User/Data/user-data-view-tabs.compone
 import {UserDataViewComponent} from './User/Data/user-data-view.component';
 import {UserDataService} from './User/Data/user-data.service';
 
+import {ServiceAccountListComponent} from './ServiceAccount/service-account-list.component';
+import {ServiceAccountService} from './ServiceAccount/service-account.service';
+import { RegDialogComponent} from './ServiceAccount/regen-dialog';
+
 import {EndpointViewTabsComponent} from './Endpoint/endpoint-view-tabs.component';
 import {EndpointViewComponent} from './Endpoint/endpoint-view.component';
 import {EndpointListComponent} from './Endpoint/endpoint-list.component';
@@ -134,6 +138,10 @@ import {AdminRoutingModule} from './admin-routing.module';
           routerLink: 'ui/endpoints'
         },
         {
+            title: 'Service Accounts',
+            routerLink: 'ui/serviceAccounts'
+        },
+        {
           title: 'APIs',
           routerLink: 'ui/apis'
         },
@@ -169,7 +177,8 @@ import {AdminRoutingModule} from './admin-routing.module';
     AdminRoutingModule,
   ],
   entryComponents: [
-    ImportExportViewComponent
+    ImportExportViewComponent,
+    RegDialogComponent
   ],
   declarations: [
     AdminComponent,
@@ -211,7 +220,11 @@ import {AdminRoutingModule} from './admin-routing.module';
     UserPluginListComponent,
     StatusViewComponent,
     ImportExportComponent,
-    ImportExportViewComponent
+    ImportExportViewComponent,
+
+    ServiceAccountListComponent,
+    RegDialogComponent
+
   ],
   providers: [
     AuthService,
@@ -234,6 +247,7 @@ import {AdminRoutingModule} from './admin-routing.module';
     EndpointGroupUserService,
     EndpointResolver,
     EndpointService,
+    ServiceAccountService,
     GroupService,
     GroupUserService,
     PluginService,

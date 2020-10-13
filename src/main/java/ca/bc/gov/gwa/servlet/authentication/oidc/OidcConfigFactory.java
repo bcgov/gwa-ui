@@ -25,7 +25,7 @@ public class OidcConfigFactory implements ConfigFactory {
         oidcConfiguration.setClientId(settings.getOidcClientId());
         oidcConfiguration.setSecret(settings.getOidcClientSecret());
         oidcConfiguration.setUseNonce(true);
-        
+        oidcConfiguration.setScope("openid");
         //oidcClient.setPreferredJwsAlgorithm(JWSAlgorithm.RS256);
         //oidcConfiguration.addCustomParam("prompt", "consent");
 

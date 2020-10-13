@@ -26,7 +26,7 @@ public class LookupUtil {
         Optional<CommonProfile> profile = profileManager.get(true);
 
         if (profile.isPresent()) {
-            //System.out.println("BEARER = " + profile.get().getAttribute("access_token", BearerAccessToken.class));
+            System.out.println("BEARER = " + profile.get().getAttribute("access_token", BearerAccessToken.class));
             return profile.get();
         } else {
             return null;

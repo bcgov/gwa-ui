@@ -31,11 +31,13 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.pac4j.core.profile.UserProfile;
 
 /**
  *
  */
+@Slf4j
 public class KongAdminService {
 
     GwaSettings config;
@@ -169,6 +171,7 @@ public class KongAdminService {
     
     public List<Service> filterServicesByPermissions (Collection<Service> services, UserProfile profile) {
         String team = String.format("#%s", profile.getAttribute("team"));
+        log.debug("FILTER BY {} using team {}", services.size(), team);
         if (profile.getAttribute("team") == null) {
             return new ArrayList<>();
         } else {

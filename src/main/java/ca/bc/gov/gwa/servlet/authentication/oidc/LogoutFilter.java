@@ -62,7 +62,11 @@ public class LogoutFilter extends AbstractConfigFilter {
         try {
             Optional<HttpAction> optAction = client.getLogoutAction(context, LookupUtil.lookupUserProfile(request, response), targetUrl);
                 //action = (HttpAction) client.getRedirectionAction(context).get();
-                action = optAction.get();
+                if (optAction.isPresent()) {
+                    action = optAction.get();
+                } else {
+                    throw new ServletException("No action");
+                }
 //            if (optAction.isPresent()) {
 //                System.out.println("Action " + optAction.get());
 //                action = optAction.get();

@@ -322,7 +322,12 @@
     <dependency>
         <groupId>org.keycloak</groupId>
         <artifactId>keycloak-admin-client</artifactId>
-        <version>11.0.2</version>
+        <version>${keycloak.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.keycloak</groupId>
+        <artifactId>keycloak-client-registration-api</artifactId>
+        <version>${keycloak.version}</version>
     </dependency>
     <!-- https://mvnrepository.com/artifact/org.ehcache/ehcache -->
     <dependency>
@@ -432,6 +437,6 @@
     <cargo.start.jvmargs></cargo.start.jvmargs>
     <jee-pac4j.version>5.0.0</jee-pac4j.version>
     <pac4jVersion>4.0.2</pac4jVersion>
-    <keycloak.version>11.0.0</keycloak.version>
+    <keycloak.version>11.0.2</keycloak.version>
   </properties>
 </project>

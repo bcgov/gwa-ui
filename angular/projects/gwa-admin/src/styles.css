@@ -236,3 +236,8 @@ td.mat-cell {
     padding-top: 5px;
     padding-bottom: 5px;
 }
+
+.secret {
+    padding: 15px;
+    font-family: 'Courier New', Courier, monospace;
+}
