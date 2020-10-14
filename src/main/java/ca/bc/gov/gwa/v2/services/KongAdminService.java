@@ -9,6 +9,7 @@ import ca.bc.gov.gwa.http.JsonHttpClient;
 import static ca.bc.gov.gwa.servlet.GwaConstants.DATA;
 import static ca.bc.gov.gwa.servlet.GwaConstants.NEXT;
 import static ca.bc.gov.gwa.servlet.GwaConstants.TOTAL;
+import ca.bc.gov.gwa.servlet.authentication.oidc.LookupUtil;
 import ca.bc.gov.gwa.util.Json;
 import ca.bc.gov.gwa.v2.conf.GwaSettings;
 import ca.bc.gov.gwa.v2.model.ACL;
@@ -170,11 +171,11 @@ public class KongAdminService {
 
     
     public List<Service> filterServicesByPermissions (Collection<Service> services, UserProfile profile) {
-        String team = String.format("#%s", profile.getAttribute("team"));
-        String ns = team.split("/")[2];
+        String nsClaim = String.format("%s", profile.getAttribute(LookupUtil.NAMESPACE_CLAIM));
+        String ns = nsClaim.split("/")[2];
         
         log.debug("FILTER BY {} using namespace {}", services.size(), ns);
-        if (profile.getAttribute("team") == null) {
+        if (profile.getAttribute(LookupUtil.NAMESPACE_CLAIM) == null) {
             return new ArrayList<>();
         } else {
             return services.stream()

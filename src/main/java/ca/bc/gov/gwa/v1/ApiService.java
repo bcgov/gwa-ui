@@ -765,30 +765,30 @@ public class ApiService implements ServletContextListener, GwaConstants {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private boolean endpointAccessAllowedApiOwner(final HttpServletResponse httpResponse,
-            final List<String> paths, final UserProfile user) {
-        
-        String teams = (String) user.getAttribute("team");
-        
-        String team = String.format("#%s", teams);
-        if (this.useEndpoints) {
-            final String endpointName = paths.get(0);
-            final Map<String, Object> api = apiGet(endpointName, true, false);
-            if (api != null) {
-                final Map<String, Object> endPoint = pluginGet(api, BCGOV_GWA_ENDPOINT);
-                if (endPoint != null) {
-                    final Map<String, Object> config = (Map<String, Object>) endPoint.get(CONFIG);
-                    final List<String> apiOwners = getList(config, API_OWNERS);
-                    if (apiOwners.contains(team)) {
-                        return true;
-                    }
-                }
-            }
-            sendError(httpResponse, HttpServletResponse.SC_NOT_FOUND);
-        }
-        return false;
-    }
+//    @SuppressWarnings("unchecked")
+//    private boolean endpointAccessAllowedApiOwner(final HttpServletResponse httpResponse,
+//            final List<String> paths, final UserProfile user) {
+//        
+//        String teams = (String) user.getAttribute("team");
+//        
+//        String team = String.format("#%s", teams);
+//        if (this.useEndpoints) {
+//            final String endpointName = paths.get(0);
+//            final Map<String, Object> api = apiGet(endpointName, true, false);
+//            if (api != null) {
+//                final Map<String, Object> endPoint = pluginGet(api, BCGOV_GWA_ENDPOINT);
+//                if (endPoint != null) {
+//                    final Map<String, Object> config = (Map<String, Object>) endPoint.get(CONFIG);
+//                    final List<String> apiOwners = getList(config, API_OWNERS);
+//                    if (apiOwners.contains(team)) {
+//                        return true;
+//                    }
+//                }
+//            }
+//            sendError(httpResponse, HttpServletResponse.SC_NOT_FOUND);
+//        }
+//        return false;
+//    }
 
     @SuppressWarnings("unchecked")
     public void endpointDelete(final HttpServletRequest httpRequest,
