@@ -20,7 +20,6 @@ import ca.bc.gov.gwa.v1.ApiService;
 import ca.bc.gov.gwa.v2.controllers.GwaController;
 import ca.bc.gov.gwa.v2.model.Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.deploy.util.StringUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
