@@ -147,7 +147,7 @@ import {AdminRoutingModule} from './admin-routing.module';
             routerLink: 'ui/serviceAccounts'
         },
         {
-            title: 'Namespaces',
+            title: 'New Namespace',
             routerLink: 'ui/namespaces'
         }
       ]
