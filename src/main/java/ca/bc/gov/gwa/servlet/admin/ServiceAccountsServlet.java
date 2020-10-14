@@ -62,12 +62,18 @@ public class ServiceAccountsServlet extends BaseServlet {
     throws ServletException, IOException {
     final List<String> paths = splitPathInfo(request);
 
-    System.out.println("D = "+paths.get(0));
-    Map<String, Object> apiResponse = new HashMap<>();
-   
-    apiService.writeJsonResponse(response, DELETED);
-//
-//    Json.writeJson(response, apiResponse);
+    CommonProfile profile = LookupUtil.lookupUserProfile(request, response);
+    
+    String ns = LookupUtil.getNamespaceClaim(profile);
+
+    GwaController cc = ApiService.getGwaController(request.getServletContext());
+
+    try {
+        cc.getGwaApiService().deleteServiceAccount(profile, ns);
+    } catch (HttpStatusException ex) {
+        apiService.writeJsonError(response, ex.getMessage(), ex);
+    }
+    Json.writeJson(response, Collections.emptyMap());
   }
   
   @Override
@@ -114,18 +120,30 @@ public class ServiceAccountsServlet extends BaseServlet {
     final HttpServletResponse response) throws IOException {
     final Map<String, Object> kongResponse;
 
-    List<Map<String, Object>> result = new ArrayList<>();
-    Map<String, Object> apiResponse = new HashMap<>();
-    apiResponse.put("id","123");
-    apiResponse.put("key","ns-sampler");
-    apiResponse.put("scope", Arrays.asList("admin:acl", "admin:gateway", "admin:catalog"));
-    result.add(apiResponse);
+    CommonProfile profile = LookupUtil.lookupUserProfile(request, response);
     
-    kongResponse = new LinkedHashMap<>();
-    kongResponse.put(DATA, result);
-    kongResponse.put(TOTAL, 1);
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.writeValue(response.getOutputStream(), kongResponse);
+    String ns = LookupUtil.getNamespaceClaim(profile);
+    
+    GwaController cc = ApiService.getGwaController(request.getServletContext());
+
+    try {
+        List<String> result = cc.getGwaApiService().getServiceAccountList(profile, ns);
+        
+        List<Map<String,Object>> data = new ArrayList<>();
+        for (String key : result) {
+            Map<String, Object> row = new HashMap<>();
+            row.put("key", key);
+            data.add(row);
+        }
+        kongResponse = new LinkedHashMap<>();
+        kongResponse.put(DATA, data);
+        kongResponse.put(TOTAL, result.size());
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.writeValue(response.getOutputStream(), kongResponse);
+    } catch (HttpStatusException ex) {
+        apiService.writeJsonError(response, ex.getMessage(), ex);
+    }
+    
   }
 
 }

@@ -63,6 +63,27 @@ public class GwaApiService {
         Map<String, Object> response = httpClient.post(getToken(profile), path, req);
         log.info("Response = {}", response);
     }
+
+    public void deleteServiceAccount (CommonProfile profile, String ns, String accountId) throws IOException {
+
+        JsonHttpClient httpClient = newRestClient();
+
+        final String path = String.format("/v1/namespaces/%s/serviceaccounts/%s", ns, accountId);
+        
+        Map<String, Object> response = httpClient.delete(getToken(profile), path);
+        log.info("Response = {}", response);
+    }
+    
+    public List<String> getServiceAccountList (CommonProfile profile, String ns) throws IOException {
+
+        JsonHttpClient httpClient = newRestClient();
+
+        final String path = String.format("/v1/namespaces/%s/serviceaccounts", ns);
+        
+        List<String> response = httpClient.list(getToken(profile), path);
+        log.info("Response = {}", response);
+        return response;
+    }
     
     private JsonHttpClient newRestClient() {
         return new JsonHttpClient(config.getGwaApiUrl());

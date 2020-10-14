@@ -34,6 +34,7 @@ import org.apache.http.impl.client.HttpClients;
 
 import ca.bc.gov.gwa.util.Json;
 import com.nimbusds.oauth2.sdk.token.BearerAccessToken;
+import java.util.List;
 
 public class JsonHttpClient implements Closeable {
   private final String serviceUrl;
@@ -143,8 +144,24 @@ public class JsonHttpClient implements Closeable {
     return getByUrl(url);
   }
 
+  public <V> V get(final BearerAccessToken token, final String path) throws IOException {
+    final String url = this.serviceUrl + path;
+    return getByUrl(token, url);
+  }
+
+  public <V> List<V> list(final BearerAccessToken token, final String path) throws IOException {
+    final String url = this.serviceUrl + path;
+    return getByUrl(token, url);
+  }
+  
   public <V> V getByUrl(final String url) throws IOException {
     final HttpGet request = new HttpGet(url);
+    return executeRequest(request);
+  }
+  
+  public <V> V getByUrl(final BearerAccessToken token, final String url) throws IOException {
+    final HttpGet request = new HttpGet(url);
+    request.addHeader("Authorization", token.toAuthorizationHeader());
     return executeRequest(request);
   }
 
