@@ -45,9 +45,9 @@ public class EndpointServlet extends BaseServlet {
   protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
     throws ServletException, IOException {
     final List<String> paths = splitPathInfo(request);
-    if (!this.apiService.endpointAccessAllowed(request, response, paths)) {
-      return;
-    }
+//    if (!this.apiService.endpointAccessAllowed(request, response, paths)) {
+//      return;
+//    }
     switch (paths.size()) {
       case 0:
         doGetEndpointList(request, response);

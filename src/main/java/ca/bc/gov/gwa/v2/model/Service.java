@@ -85,11 +85,13 @@ public class Service implements Comparable<Service> {
         return name.compareToIgnoreCase(o.getName());
     }
     
-    public boolean isOwner (String id) {
-        return plugins.stream().filter(p -> p.getName().equals("bcgov-gwa-endpoint"))
-                .map(p -> p.getConfigStringArray("api_owners"))
-                .findFirst().get().stream()
-                .filter(owner -> owner.equals(id))
-                .findFirst().isPresent();
+    public boolean isOwner (String ns) {
+//        return plugins.stream().filter(p -> p.getName().equals("bcgov-gwa-endpoint"))
+//                .map(p -> p.getConfigStringArray("api_owners"))
+//                .findFirst().get().stream()
+//                .filter(owner -> owner.equals(String.format("#/team/%s", ns)))
+//                .findFirst().isPresent();
+          return tags.stream().filter(t -> t.equals(String.format("ns.%s", ns)))
+                  .findFirst().isPresent();
     }
 }

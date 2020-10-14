@@ -171,13 +171,15 @@ public class KongAdminService {
     
     public List<Service> filterServicesByPermissions (Collection<Service> services, UserProfile profile) {
         String team = String.format("#%s", profile.getAttribute("team"));
-        log.debug("FILTER BY {} using team {}", services.size(), team);
+        String ns = team.split("/")[2];
+        
+        log.debug("FILTER BY {} using namespace {}", services.size(), ns);
         if (profile.getAttribute("team") == null) {
             return new ArrayList<>();
         } else {
             return services.stream()
                     .filter(s -> {
-                        return s.isOwner(team);
+                        return s.isOwner(ns);
                     })
                     .collect(Collectors 
                         .toCollection(ArrayList::new));
