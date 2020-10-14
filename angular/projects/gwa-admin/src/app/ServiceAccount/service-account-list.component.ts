@@ -64,8 +64,9 @@ export class ServiceAccountListComponent extends BaseListComponent<ServiceAccoun
       );
   }
 
-  deleteServiceAccount(): void {
-    this.deleteObject(this.serviceAccount);
+  deleteServiceAccount(serviceAccount: ServiceAccount): void {
+    let s = this.service;
+    this.deleteObject(serviceAccount);
   }
 
   regenerateCredentials(serviceAccount: ServiceAccount): void {

@@ -40,8 +40,13 @@ public class NamespacesServlet extends BaseServlet {
 
     GwaController cc = ApiService.getGwaController(request.getServletContext());
 
+    ObjectMapper mapper = new ObjectMapper();
+    Map<String, String> input = mapper.readValue(request.getInputStream(), Map.class);
+    
+    String name = input.get("name");
+    
     try {
-        cc.getGwaApiService().createNamespace(LookupUtil.lookupUserProfile(request, response), request.getParameter("name"));
+        cc.getGwaApiService().createNamespace(LookupUtil.lookupUserProfile(request, response), name);
     } catch (HttpStatusException ex) {
         apiService.writeJsonError(response, ex.getMessage(), ex);
     }

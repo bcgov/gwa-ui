@@ -42,14 +42,16 @@ public class GwaApiService {
         final Map<String, Object> request = Collections.singletonMap("name", nsName);
 
         JsonHttpClient httpClient = newRestClient();
-                
+        
+        log.info("Create Namespace {}", nsName);
+        
         final String path = String.format("/v1/namespaces");
 
         Map<String, Object> response = httpClient.post(getToken(profile), path, request);
         log.info("Response = {}", response);
     }
 
-    public void createServiceAccount (CommonProfile profile, String ns, List<String> scopes) throws IOException {
+    public Map<String, Object> createServiceAccount (CommonProfile profile, String ns, List<String> scopes) throws IOException {
 
         Map<String, Object> req = new HashMap<>();
         req.put("key", String.format("ns-%s", ns));
@@ -62,6 +64,7 @@ public class GwaApiService {
         
         Map<String, Object> response = httpClient.post(getToken(profile), path, req);
         log.info("Response = {}", response);
+        return response;
     }
 
     public void deleteServiceAccount (CommonProfile profile, String ns, String accountId) throws IOException {
@@ -73,6 +76,18 @@ public class GwaApiService {
         Map<String, Object> response = httpClient.delete(getToken(profile), path);
         log.info("Response = {}", response);
     }
+
+    public Map<String, Object> updateServiceAccountCredentials (CommonProfile profile, String ns, String accountId) throws IOException {
+
+        JsonHttpClient httpClient = newRestClient();
+
+        final String path = String.format("/v1/namespaces/%s/serviceaccounts/%s", ns, accountId);
+        
+        Map<String, Object> response = httpClient.put(getToken(profile), path, Collections.emptyMap());
+        log.info("Response = {}", response);
+        return response;
+    }
+
     
     public List<String> getServiceAccountList (CommonProfile profile, String ns) throws IOException {
 

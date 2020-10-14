@@ -48,27 +48,7 @@ export class NamespaceViewComponent extends BaseDetailComponent<any> implements 
   ngOnInit() {
     this.route.params
       .subscribe(params => {
-        // this.namespaceService.getStatus().subscribe(statusRecord => {
-        //   this.object = statusRecord;
-        //   if (statusRecord) {
-        //     const serverRecords = [];
-        //     for (const name of Object.keys(statusRecord.server)) {
-        //       serverRecords.push({
-        //         name: name,
-        //         text: statusRecord.server[name].toString()
-        //       });
-        //     }
-        //     this.serverDataSource.data = serverRecords;
-        //     const databaseRecords = [];
-        //     for (const name of Object.keys(statusRecord.database)) {
-        //       databaseRecords.push({
-        //         name: name,
-        //         text: statusRecord.database[name].toString()
-        //       });
-        //     }
-        //     this.databaseDataSource.data = databaseRecords;
-        //   }
-        // });
+
       });
   }
 
@@ -82,7 +62,6 @@ export class NamespaceViewComponent extends BaseDetailComponent<any> implements 
     });
 
     dialogRef.afterClosed().subscribe(result => {
-        console.log("Closed with "+result);
         if (result) {
             s.addObject(
                 {name : result}

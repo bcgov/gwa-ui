@@ -20,6 +20,7 @@ import ca.bc.gov.gwa.v1.ApiService;
 import ca.bc.gov.gwa.v2.controllers.GwaController;
 import ca.bc.gov.gwa.v2.model.Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.deploy.util.StringUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -61,7 +62,9 @@ public class ServiceAccountsServlet extends BaseServlet {
   protected void doDelete(final HttpServletRequest request, final HttpServletResponse response)
     throws ServletException, IOException {
     final List<String> paths = splitPathInfo(request);
-
+    
+    String accountId = paths.get(0);
+    
     CommonProfile profile = LookupUtil.lookupUserProfile(request, response);
     
     String ns = LookupUtil.getNamespaceClaim(profile);
@@ -69,7 +72,7 @@ public class ServiceAccountsServlet extends BaseServlet {
     GwaController cc = ApiService.getGwaController(request.getServletContext());
 
     try {
-        cc.getGwaApiService().deleteServiceAccount(profile, ns);
+        cc.getGwaApiService().deleteServiceAccount(profile, ns, accountId);
     } catch (HttpStatusException ex) {
         apiService.writeJsonError(response, ex.getMessage(), ex);
     }
@@ -90,11 +93,11 @@ public class ServiceAccountsServlet extends BaseServlet {
     List<String> scopes = Arrays.asList("admin:acl", "admin:gateway", "admin:catalog");
     
     try {
-        cc.getGwaApiService().createServiceAccount(profile, ns, scopes);
+        Map<String, Object> result = cc.getGwaApiService().createServiceAccount(profile, ns, scopes);
+        Json.writeJson(response, result);
     } catch (HttpStatusException ex) {
         apiService.writeJsonError(response, ex.getMessage(), ex);
     }
-    Json.writeJson(response, Collections.emptyMap());
   }
 
   @Override
@@ -102,13 +105,20 @@ public class ServiceAccountsServlet extends BaseServlet {
     throws ServletException, IOException {
     final List<String> paths = splitPathInfo(request);
 
-    Map<String, Object> apiResponse = new HashMap<>();
-    apiResponse.put("key","ns-sampler");
-    apiResponse.put("secret",UUID.randomUUID().toString());
-    apiResponse.put("scope", Arrays.asList("admin:acl", "admin:gateway", "admin:catalog"));
-   
-    Json.writeJson(response, apiResponse);
+    String accountId = paths.get(0);
+    
+    CommonProfile profile = LookupUtil.lookupUserProfile(request, response);
+    
+    String ns = LookupUtil.getNamespaceClaim(profile);
 
+    GwaController cc = ApiService.getGwaController(request.getServletContext());
+
+    try {
+        Map<String, Object> apiResponse = cc.getGwaApiService().updateServiceAccountCredentials(profile, ns, accountId);
+        Json.writeJson(response, apiResponse);
+    } catch (HttpStatusException ex) {
+        apiService.writeJsonError(response, ex.getMessage(), ex);
+    }
   }
   
 //  private void doGetEndpoint(final HttpServletRequest request, final HttpServletResponse response, final List<String> paths) throws IOException {

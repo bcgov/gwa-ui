@@ -93,9 +93,16 @@ public class JsonHttpClient implements Closeable {
       this.httpClient = null;
     }
   }
-
+  
   public Map<String, Object> delete(final String path) throws IOException {
+      return delete(null, path);
+  }
+  
+  public Map<String, Object> delete(final BearerAccessToken token, final String path) throws IOException {
     final HttpDelete httpRequest = new HttpDelete(this.serviceUrl + path);
+    if (token != null) {
+        httpRequest.addHeader("Authorization", token.toAuthorizationHeader());
+    }
     try (
       CloseableHttpResponse updateResponse = this.httpClient.execute(httpRequest)) {
       final StatusLine statusLine = updateResponse.getStatusLine();
