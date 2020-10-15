@@ -37,11 +37,11 @@ public class LookupUtil {
     static public String getNamespaceClaim (CommonProfile profile) {
         String ns = (String) profile.getAttribute(NAMESPACE_CLAIM);
         log.debug("Lookup With {}", ns);
-        String[] parts = ns.split("/");
-        log.debug("parts = "+parts.length);
-        
-        String namespace = parts[2];
-        log.debug("Lookup Namespace {} -- {}", ns, parts[2]);
-        return namespace;
+//        String[] parts = ns.split("/");
+//        log.debug("parts = "+parts.length);
+//        
+//        String namespace = parts[2];
+//        log.debug("Lookup Namespace {} -- {}", ns, parts[2]);
+        return ns;
     }
 }

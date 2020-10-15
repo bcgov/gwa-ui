@@ -171,8 +171,7 @@ public class KongAdminService {
 
     
     public List<Service> filterServicesByPermissions (Collection<Service> services, UserProfile profile) {
-        String nsClaim = String.format("%s", profile.getAttribute(LookupUtil.NAMESPACE_CLAIM));
-        String ns = nsClaim.split("/")[2];
+        String ns = String.format("%s", profile.getAttribute(LookupUtil.NAMESPACE_CLAIM));
         
         log.debug("FILTER BY {} using namespace {}", services.size(), ns);
         if (profile.getAttribute(LookupUtil.NAMESPACE_CLAIM) == null) {
