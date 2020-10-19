@@ -6,17 +6,34 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 
 import ca.bc.gov.gwa.servlet.BasePrincipal;
+import ca.bc.gov.gwa.servlet.authentication.oidc.LookupUtil;
+import javax.servlet.http.HttpServletResponse;
+import org.pac4j.core.profile.Pac4JPrincipal;
+import org.pac4j.core.profile.UserProfile;
 
 public class GitHubPrincipal extends BasePrincipal {
+  public static final String ADMIN_ROLE = "gwa_admin";
   public static final String DEVELOPER_ROLE = "gwa_github_developer";
 
   private static final long serialVersionUID = 1L;
 
-  public static boolean hasDeveloperRole(final HttpServletRequest request) {
+  public static boolean hasDeveloperRole(final HttpServletRequest request, final HttpServletResponse response) {
     final Principal userPrincipal = request.getUserPrincipal();
     if (userPrincipal instanceof GitHubPrincipal) {
       final GitHubPrincipal principal = (GitHubPrincipal)userPrincipal;
       return principal.isUserInRole(DEVELOPER_ROLE);
+    } else if (userPrincipal instanceof Pac4JPrincipal) {
+      UserProfile user = LookupUtil.lookupUserProfile(request, response);
+      return true;
+    }
+    return false;
+  }
+
+  public static boolean hasAdminRole(final HttpServletRequest request) {
+    final Principal userPrincipal = request.getUserPrincipal();
+    if (userPrincipal instanceof GitHubPrincipal) {
+      final GitHubPrincipal principal = (GitHubPrincipal)userPrincipal;
+      return principal.isUserInRole(ADMIN_ROLE);
     }
     return false;
   }
@@ -31,6 +48,10 @@ public class GitHubPrincipal extends BasePrincipal {
 
   public void addDeveloperRole() {
     addRole(DEVELOPER_ROLE);
+  }
+
+  public void addAdminRole() {
+    addRole(ADMIN_ROLE);
   }
 
   @Override
@@ -50,6 +71,10 @@ public class GitHubPrincipal extends BasePrincipal {
 
   public boolean hasDeveloperRole() {
     return isUserInRole(DEVELOPER_ROLE);
+  }
+
+  public boolean hasAdminRole() {
+    return isUserInRole(ADMIN_ROLE);
   }
 
   @Override

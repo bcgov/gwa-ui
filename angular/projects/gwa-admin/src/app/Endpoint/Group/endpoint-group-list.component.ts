@@ -48,7 +48,7 @@ export class EndpointGroupListComponent extends BaseListComponent<Group> impleme
         this.api = data.api;
         const endpoint = this.api.plugin('acl');
         if (endpoint) {
-          const groupNames = endpoint.config.whitelist;
+          const groupNames = endpoint.config.allow;
           if (groupNames) {
             const records = [];
             for (const groupName of groupNames) {

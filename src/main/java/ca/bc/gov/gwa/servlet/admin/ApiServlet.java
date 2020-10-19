@@ -8,9 +8,12 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import ca.bc.gov.gwa.servlet.ApiService;
+import ca.bc.gov.gwa.v1.ApiService;
 import ca.bc.gov.gwa.servlet.GwaConstants;
 import ca.bc.gov.gwa.util.Json;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @WebServlet(urlPatterns = "/int/rest/apis/*", loadOnStartup = 1)
 public class ApiServlet extends BaseAdminServlet implements GwaConstants {
@@ -82,7 +85,7 @@ public class ApiServlet extends BaseAdminServlet implements GwaConstants {
   }
 
   private void apisList(final HttpServletRequest request, final HttpServletResponse response) {
-    this.apiService.handleListAll(request, response, "/apis");
+    this.apiService.handleListAll(request, response, APIS_PATH2);
   }
 
   @Override
@@ -114,7 +117,11 @@ public class ApiServlet extends BaseAdminServlet implements GwaConstants {
             if (pathCount == 4) {
               if (GET.equals(method)) {
                 if (GROUPS.equals(path2) && USERS.equals(path4)) {
-                  statusCode = groupUsersList(request, response, apiIdOrName, path3);
+                    try {
+                        statusCode = groupUsersList(request, response, apiIdOrName, path3);
+                    } catch (IOException ex) {
+                        Logger.getLogger(ApiServlet.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 } else if (PLUGINS.equals(path2) && USERS.equals(path4)) {
                   statusCode = pluginUsersList(request, response, apiIdOrName, path3);
                 }
@@ -153,6 +160,7 @@ public class ApiServlet extends BaseAdminServlet implements GwaConstants {
 
   private void groupUserRecordAdd(final HttpServletResponse response, final String apiName,
     final String groupName, final String userName) {
+      System.out.println("ADD");
     this.apiService.apiGroupUserAdd(response, apiName, groupName, userName);
   }
 
@@ -162,8 +170,8 @@ public class ApiServlet extends BaseAdminServlet implements GwaConstants {
   }
 
   private int groupUsersList(final HttpServletRequest request, final HttpServletResponse response,
-    final String apiName, final String groupName) {
-    this.apiService.endpointGroupUserList(request, response, apiName, groupName);
+    final String apiName, final String groupName) throws IOException {
+    this.apiService.groupUserList(request, response, groupName);
     return 0;
   }
 
@@ -240,7 +248,7 @@ public class ApiServlet extends BaseAdminServlet implements GwaConstants {
     final HttpServletResponse httpResponse, final String apiId, final String pluginName,
     final String username) {
     this.apiService.handleRequest(httpResponse, httpClient -> {
-      final String userId = this.apiService.userIdGetByUsername(httpClient, username);
+      final String userId = this.apiService.consumerIdGetByUsername(httpClient, username);
 
       final String path = "/plugins?api_id=" + apiId + "&name=" + pluginName + "&consumer_id="
         + userId;

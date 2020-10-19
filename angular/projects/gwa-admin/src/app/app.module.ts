@@ -70,6 +70,14 @@ import {UserDataViewTabsComponent} from './User/Data/user-data-view-tabs.compone
 import {UserDataViewComponent} from './User/Data/user-data-view.component';
 import {UserDataService} from './User/Data/user-data.service';
 
+import {ServiceAccountListComponent} from './ServiceAccount/service-account-list.component';
+import {ServiceAccountService} from './ServiceAccount/service-account.service';
+import { RegDialogComponent} from './ServiceAccount/regen-dialog';
+
+import {NamespaceService} from './Namespace/namespace.service';
+import {NamespaceViewComponent} from './Namespace/namespace-view.component';
+import { NewNamespaceDialogComponent} from './Namespace/new-dialog';
+
 import {EndpointViewTabsComponent} from './Endpoint/endpoint-view-tabs.component';
 import {EndpointViewComponent} from './Endpoint/endpoint-view.component';
 import {EndpointListComponent} from './Endpoint/endpoint-list.component';
@@ -80,6 +88,7 @@ import {EndpointGroupListComponent} from './Endpoint/Group/endpoint-group-list.c
 
 import {EndpointGroupUserListComponent} from './Endpoint/Group/endpoint-group-user-list.component';
 import {EndpointGroupUserService} from './Endpoint/Group/endpoint-group-user.service';
+
 
 import {GroupUserListComponent} from './Group/group-user-list.component';
 import {GroupUserService} from './Group/group-user.service';
@@ -127,37 +136,19 @@ import {AdminRoutingModule} from './admin-routing.module';
 
     RevolsysAngularBcgovPageModule.forRoot({
       basePath: '/int',
-      title: 'Gateway Admin',
+      title: 'API Services Portal',
       headerMenuItems: [
         {
-          title: 'Endpoints',
+          title: 'Services',
           routerLink: 'ui/endpoints'
         },
         {
-          title: 'APIs',
-          routerLink: 'ui/apis'
+            title: 'Service Accounts',
+            routerLink: 'ui/serviceAccounts'
         },
         {
-          title: 'Plugins',
-          routerLink: 'ui/plugins'
-        },
-        {
-          title: 'Users',
-          icon: 'person',
-          routerLink: 'ui/users'
-        },
-        {
-          title: 'Groups',
-          icon: 'people',
-          routerLink: 'ui/groups'
-        },
-        {
-          title: 'Status',
-          routerLink: 'ui/status'
-        },
-        {
-          title: 'Import/Export',
-          routerLink: 'ui/importExport'
+            title: 'New Namespace',
+            routerLink: 'ui/namespaces'
         }
       ]
     }
@@ -169,7 +160,9 @@ import {AdminRoutingModule} from './admin-routing.module';
     AdminRoutingModule,
   ],
   entryComponents: [
-    ImportExportViewComponent
+    ImportExportViewComponent,
+    RegDialogComponent,
+    NewNamespaceDialogComponent
   ],
   declarations: [
     AdminComponent,
@@ -211,7 +204,13 @@ import {AdminRoutingModule} from './admin-routing.module';
     UserPluginListComponent,
     StatusViewComponent,
     ImportExportComponent,
-    ImportExportViewComponent
+    ImportExportViewComponent,
+
+    ServiceAccountListComponent,
+    NamespaceViewComponent,
+    RegDialogComponent,
+    NewNamespaceDialogComponent
+
   ],
   providers: [
     AuthService,
@@ -234,6 +233,8 @@ import {AdminRoutingModule} from './admin-routing.module';
     EndpointGroupUserService,
     EndpointResolver,
     EndpointService,
+    ServiceAccountService,
+    NamespaceService,
     GroupService,
     GroupUserService,
     PluginService,

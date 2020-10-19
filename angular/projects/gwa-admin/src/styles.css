@@ -194,3 +194,50 @@ span.mat-select-placeholder, span.mat-floating-placeholder {
 button.mat-icon-button {
   background-color: initial;
 }
+
+
+
+
+.mat-column-tags .mat-chip-list-wrapper {
+    flex-wrap: nowrap;
+    color: blue;
+}
+
+.mat-column-tags .mat-chip.mat-standard-chip {
+    background-color: lightblue;
+    color: black;
+}
+
+.mat-column-hosts .mat-chip.mat-standard-chip {
+    background-color: lightsteelblue;
+    color: black;
+}
+
+.mat-chip.mat-standard-chip {
+    white-space: nowrap;
+}
+
+/*.mat-column-tags > .mat-chip.mat-standard-chip {
+    background-color: lightblue !important;
+    color: black;
+}*/
+
+.mat-column-name {
+    white-space: nowrap;
+    padding-right: 10px !important;
+}
+
+.mat-accent {
+    background-color: blue;
+    color: white;
+}
+
+td.mat-cell {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.secret {
+    padding: 15px;
+    font-family: 'Courier New', Courier, monospace;
+}

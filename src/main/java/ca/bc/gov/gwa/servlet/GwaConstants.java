@@ -23,7 +23,7 @@ public interface GwaConstants {
 
   static String ACLS_PATH = "/acls";
 
-  static String API_ID = "api_id";
+  static String API_ID = "service_id";
 
   static String API_OWNERS = "api_owners";
 
@@ -43,15 +43,31 @@ public interface GwaConstants {
 
   static String APIS = "apis";
 
-  static String APIS_PATH = "/apis";
+  static String APIS_PATH = "services";
 
-  static String APIS_PATH2 = "/apis/";
+  static String APIS_PATH2 = "/services/";
+
+  static String ROUTES = "routes";
+
+  static String ROUTES_PATH = "/routes";
+
+  static String ROUTES_PATH2 = "/routes/";
+
+  static String SERVICES = "services";
+
+  static String SERVICE_PATH = "/service";
+
+  static String SERVICES_PATH = "/services";
+
+  static String SERVICES_PATH2 = "/services/";
 
   static String APPLICATION_JSON = "application/json";
 
   static String BCGOV_GWA_ENDPOINT = "bcgov-gwa-endpoint";
 
   static String CONFIG = "config";
+
+  static String CONSUMER = "consumer";
 
   static String CONSUMER_ID = "consumer_id";
 
@@ -129,7 +145,7 @@ public interface GwaConstants {
 
   static String VERSION = "version";
 
-  static String WHITELIST = "whitelist";
+  static String WHITELIST = "allow";
 
   static List<String> ACL_FIELD_NAMES = Arrays.asList(WHITELIST);
 

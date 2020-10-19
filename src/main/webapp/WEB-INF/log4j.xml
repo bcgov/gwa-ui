@@ -15,8 +15,13 @@
     </layout>
   </appender>
 
+  <logger name="ca.bc.gov" additivity="false">
+        <level value="DEBUG" />
+        <appender-ref ref="ConsoleLog" />
+  </logger>
+
   <root>
-    <level value="ERROR" />
+    <level value="INFO" />
     <appender-ref ref="ConsoleLog" />
   </root>
 </log4j:configuration>

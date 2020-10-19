@@ -18,7 +18,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import ca.bc.gov.gwa.servlet.ApiService;
+import ca.bc.gov.gwa.v1.ApiService;
 import ca.bc.gov.gwa.servlet.GwaConstants;
 import ca.bc.gov.gwa.util.Json;
 

@@ -20,30 +20,36 @@
           </mat-form-field>
           <mat-form-field class="flexField">
             <mat-chip-list #uriList>
-              <mat-chip *ngFor="let uri of object.uris">{{uri}}</mat-chip>
+              <mat-chip *ngFor="let uri of object.paths">{{uri}}</mat-chip>
               <input placeholder="Paths" [matChipInputFor]="uriList" readonly />
             </mat-chip-list>
           </mat-form-field>
         </div>
 
-        <div class="flexRowToColumn" *ngIf="endpoint.config['api_owners'].length > 0">
+        <div class="flexRowToColumn">
           <mat-form-field class="flexField">
             <mat-chip-list #apiOwnerList>
               <mat-chip *ngFor="let apiOwner of endpoint.config['api_owners']">{{apiOwner}}</mat-chip>
-              <input placeholder="Owner Usernames" [matChipInputFor]="apiOwnerList" readonly />
+              <input placeholder="Owners" [matChipInputFor]="apiOwnerList" readonly />
+            </mat-chip-list>
+          </mat-form-field>
+          <mat-form-field class="flexField">
+            <mat-chip-list #tagList>
+              <mat-chip *ngFor="let tag of object.tags">{{tag}}</mat-chip>
+              <input placeholder="Tags" [matChipInputFor]="tagList" readonly />
             </mat-chip-list>
           </mat-form-field>
         </div>
 
         <div class="flexRowToColumn">
-          <mat-slide-toggle class="flexField" name="keyAuth_enabled" [checked]="keyAuth && keyAuth.enabled" color="primary">Allow Developer Keys</mat-slide-toggle>
+          <mat-slide-toggle class="flexField" name="keyAuth_enabled" [checked]="keyAuth && keyAuth.enabled" color="primary" disabled>Allow Developer Keys</mat-slide-toggle>
         </div>
 
         <div class="flexRowToColumn">
           <mat-slide-toggle class="flexField" name="acl_enabled" [checked]="acl && acl.enabled" color="primary" disabled>Groups Enabled</mat-slide-toggle>
            <mat-form-field class="flexField" *ngIf="acl">
             <mat-chip-list #groupList>
-              <mat-chip *ngFor="let groupName of acl.config['whitelist']">{{groupName}}</mat-chip>
+              <mat-chip *ngFor="let groupName of acl.config['allow']">{{groupName}}</mat-chip>
               <input placeholder="Group Names" [matChipInputFor]="groupList" readonly />
             </mat-chip-list>
           </mat-form-field>
@@ -73,8 +79,8 @@
       </mat-card-content>
         <mat-card-actions>
           <button (click)="routeList()" mat-button>Close</button>
-          <button (click)="save(false)" mat-raised-button color="accent" [disabled]="!endpointForm.form.valid" *ngIf="object.id">Save</button>
-          <button (click)="save(true)" mat-raised-button color="primary" [disabled]="!endpointForm.form.valid">Save &amp; Close</button>
+<!--          <button (click)="save(false)" mat-raised-button color="accent" [disabled]="!endpointForm.form.valid" *ngIf="object.id">Save</button>
+          <button (click)="save(true)" mat-raised-button color="primary" [disabled]="!endpointForm.form.valid">Save &amp; Close</button>-->
       </mat-card-actions>
     </mat-card>
   </form>
