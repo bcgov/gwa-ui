@@ -27,7 +27,11 @@ public interface Json {
           if (parser.hasNext() && parser.next() != EventType.END_DOCUMENT) {
             throw new IllegalStateException("Extra content at end of file: " + parser);
           }
+          if (value == EventType.END_DOCUMENT) {
+              return null;
+          }
           return value;
+        } else {
         }
       }
       return null;
@@ -80,7 +84,7 @@ public interface Json {
   static String toString(final Object value) {
     final StringWriter stringWriter = new StringWriter();
     try (
-      JsonWriter jsonWriter = new JsonWriter(stringWriter)) {
+      JsonWriter jsonWriter = new JsonWriter(stringWriter, true)) {
       jsonWriter.value(value);
       return stringWriter.toString();
     } catch (final IOException e) {

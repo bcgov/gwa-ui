@@ -195,6 +195,14 @@ The alternate method is to include the appRedirectUrl with a URL to your applica
 
 This method does not require the page to be in an iframe or frame.
 
+# Development
+
+`Netbeans` provides quite a good development environment with Tomcat.  VSCode and Intellij both had issues with this project.
+
+```
+
+```
+
 # License
 ```
 Copyright 2018 Province of British Columbia

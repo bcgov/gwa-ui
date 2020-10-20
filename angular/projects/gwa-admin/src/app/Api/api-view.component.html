@@ -108,7 +108,7 @@
             <mat-label>Group Names</mat-label>
             <mat-chip-list #groupList>
               <mat-chip
-                *ngFor="let group of this.acl.config.whitelist"
+                *ngFor="let group of this.acl.config.allow"
                 selectable="true"
                 [removable]="acl.enabled"
                 (removed)="deleteGroupName(group)">

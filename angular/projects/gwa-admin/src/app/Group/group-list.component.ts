@@ -21,7 +21,7 @@ export class GroupListComponent extends BaseListComponent<Group> {
     protected groupService: GroupService
   ) {
     super(injector, groupService, 'Groups - Gateway Admin');
-    this.columnNames = ['group', 'created_at', 'actions'];
+    this.columnNames = ['group', 'actions'];
   }
 
   addGroup() {

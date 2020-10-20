@@ -17,6 +17,7 @@ export class EndpointListComponent extends ApiListComponent {
     protected apiService: ApiService
   ) {
     super(injector, apiService);
+    this.columnNames = ['name', 'tags', 'hosts', 'paths'];
     this.setTitle('Endpoints - Gateway Admin');
     this.path = '/endpoints';
   }

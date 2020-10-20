@@ -33,6 +33,8 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 
 import ca.bc.gov.gwa.util.Json;
+import com.nimbusds.oauth2.sdk.token.BearerAccessToken;
+import java.util.List;
 
 public class JsonHttpClient implements Closeable {
   private final String serviceUrl;
@@ -71,6 +73,7 @@ public class JsonHttpClient implements Closeable {
     }
   }
 
+  
   private void appendContent(final StringBuilder content, final CloseableHttpResponse response)
     throws IOException {
     try (
@@ -90,9 +93,16 @@ public class JsonHttpClient implements Closeable {
       this.httpClient = null;
     }
   }
-
+  
   public Map<String, Object> delete(final String path) throws IOException {
+      return delete(null, path);
+  }
+  
+  public Map<String, Object> delete(final BearerAccessToken token, final String path) throws IOException {
     final HttpDelete httpRequest = new HttpDelete(this.serviceUrl + path);
+    if (token != null) {
+        httpRequest.addHeader("Authorization", token.toAuthorizationHeader());
+    }
     try (
       CloseableHttpResponse updateResponse = this.httpClient.execute(httpRequest)) {
       final StatusLine statusLine = updateResponse.getStatusLine();
@@ -141,8 +151,24 @@ public class JsonHttpClient implements Closeable {
     return getByUrl(url);
   }
 
+  public <V> V get(final BearerAccessToken token, final String path) throws IOException {
+    final String url = this.serviceUrl + path;
+    return getByUrl(token, url);
+  }
+
+  public <V> List<V> list(final BearerAccessToken token, final String path) throws IOException {
+    final String url = this.serviceUrl + path;
+    return getByUrl(token, url);
+  }
+  
   public <V> V getByUrl(final String url) throws IOException {
     final HttpGet request = new HttpGet(url);
+    return executeRequest(request);
+  }
+  
+  public <V> V getByUrl(final BearerAccessToken token, final String url) throws IOException {
+    final HttpGet request = new HttpGet(url);
+    request.addHeader("Authorization", token.toAuthorizationHeader());
     return executeRequest(request);
   }
 
@@ -173,6 +199,13 @@ public class JsonHttpClient implements Closeable {
     return executeRequestJson(request, data);
   }
 
+  public Map<String, Object> post(final BearerAccessToken token, final String path, final Map<String, Object> data)
+    throws IOException {
+    final HttpPost request = new HttpPost(this.serviceUrl + path);
+    request.addHeader("Authorization", token.toAuthorizationHeader());
+    return executeRequestJson(request, data);
+  }
+  
   public Map<String, Object> put(final String path) throws IOException {
     final HttpPut httpRequest = new HttpPut(this.serviceUrl + path);
     final StringEntity updateRequestEntity = new StringEntity("", ContentType.TEXT_PLAIN);
@@ -185,4 +218,12 @@ public class JsonHttpClient implements Closeable {
     final HttpPut updateRequest = new HttpPut(this.serviceUrl + path);
     return executeRequestJson(updateRequest, data);
   }
+
+  public Map<String, Object> put(final BearerAccessToken token, final String path, final Map<String, Object> data)
+    throws IOException {
+    final HttpPut updateRequest = new HttpPut(this.serviceUrl + path);
+    updateRequest.addHeader("Authorization", token.toAuthorizationHeader());
+    return executeRequestJson(updateRequest, data);
+  }
+
 }

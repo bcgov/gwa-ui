@@ -21,12 +21,13 @@ import javax.servlet.http.HttpSession;
 
 import ca.bc.gov.gwa.http.JsonHttpClient;
 import ca.bc.gov.gwa.servlet.AbstractFilter;
-import ca.bc.gov.gwa.servlet.ApiService;
+import ca.bc.gov.gwa.v1.ApiService;
 import ca.bc.gov.gwa.util.LruMap;
 
-@WebFilter(urlPatterns = {
-  "/", "/login/*", "/git/*", "/logout", "/rest/*", "/ui/*"
-})
+//@WebFilter(urlPatterns = {
+//  "/git/*", "/logout", "/rest/*", "/ui/*",
+//  "/int/ui/*", "/int/rest/*", "/int/logout", "/int/login/*"
+//})
 public class DeveloperKeyAuthenticationFilter extends AbstractFilter {
 
   private static final int EXPIRY_TIME_MS = 10 * 60 * 1000;
@@ -37,8 +38,7 @@ public class DeveloperKeyAuthenticationFilter extends AbstractFilter {
 
   private static final String GIT_HUB_STATE_URL_MAP = "GitHubStateUrlMap";
 
-  protected transient ApiService apiService;
-
+ 
   @SuppressWarnings("unchecked")
   private void addGitHubGroups(final JsonHttpClient client, final String accessToken,
     final Set<String> groups) throws IOException {
@@ -150,6 +150,10 @@ public class DeveloperKeyAuthenticationFilter extends AbstractFilter {
                 }
                 principal.addDeveloperRole();
               }
+              if (kongGroups.contains(GitHubPrincipal.ADMIN_ROLE)) {
+                principal.addAdminRole();
+              }
+
               session.setAttribute(GIT_HUB_PRINCIPAL, principal);
               sendRedirect(httpResponse, redirectUrl);
               return;
@@ -193,13 +197,6 @@ public class DeveloperKeyAuthenticationFilter extends AbstractFilter {
     } else {
       chain.doFilter(httpRequest, httpResponse);
     }
-  }
-
-  @Override
-  public void init(final FilterConfig filterConfig) throws ServletException {
-    super.init(filterConfig);
-    final ServletContext servletContext = filterConfig.getServletContext();
-    this.apiService = ApiService.get(servletContext);
   }
 
 }
