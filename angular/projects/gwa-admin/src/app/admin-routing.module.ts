@@ -74,7 +74,7 @@ const routes: Routes = [
   },
   {path: 'ui/endpoints/:apiName/groups/:groupName', component: EndpointGroupUserListComponent},
   
-  {path: 'ui/serviceAccounts', component: ServiceAccountListComponent},
+  {path: 'ui/serviceAccounts', component: ServiceAccountListComponent, canActivate: [RoleGuard], data: {roles: ['gwa_ns_admin']}},
   {path: 'ui/namespaces', component: NamespaceViewComponent},
 
   {path: '**', component: PageNotFoundComponent}

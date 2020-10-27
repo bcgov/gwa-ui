@@ -7,9 +7,11 @@ package ca.bc.gov.gwa.servlet.authentication.oidc;
 
 import com.nimbusds.oauth2.sdk.token.BearerAccessToken;
 import java.util.Optional;
+import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import net.minidev.json.JSONArray;
 import org.pac4j.core.context.JEEContext;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.profile.CommonProfile;
@@ -28,10 +30,18 @@ public class LookupUtil {
 
         if (profile.isPresent()) {
             System.out.println("BEARER = " + profile.get().getAttribute("access_token", BearerAccessToken.class));
+            System.out.println("IsAdmin? " + isNamespaceAdmin(profile.get()));
+            
             return profile.get();
         } else {
             return null;
         }
+    }
+    
+    static public boolean isNamespaceAdmin (CommonProfile profile) {
+        String groupMatch = String.format("/ns-admins/%s", getNamespaceClaim(profile));
+        JSONArray groups = profile.getAttribute("groups", JSONArray.class);
+        return groups.contains(groupMatch);
     }
     
     static public String getNamespaceClaim (CommonProfile profile) {

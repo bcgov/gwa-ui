@@ -1,6 +1,8 @@
 package ca.bc.gov.gwa.servlet;
 
+import ca.bc.gov.gwa.servlet.authentication.oidc.LookupUtil;
 import ca.bc.gov.gwa.v1.ApiService;
+import static com.sun.corba.se.spi.presentation.rmi.StubAdapter.request;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.ArrayList;
@@ -12,6 +14,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.pac4j.core.profile.CommonProfile;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

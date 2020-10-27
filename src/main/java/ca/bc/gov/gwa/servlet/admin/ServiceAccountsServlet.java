@@ -33,7 +33,7 @@ import org.pac4j.core.profile.CommonProfile;
 
 @Slf4j
 @WebServlet(urlPatterns = "/int/rest/serviceAccounts/*", loadOnStartup = 1)
-public class ServiceAccountsServlet extends BaseServlet {
+public class ServiceAccountsServlet extends BaseNSAdminServlet {
   private static final long serialVersionUID = 1L;
 
   @Override

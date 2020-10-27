@@ -2,6 +2,8 @@ package ca.bc.gov.gwa.servlet;
 
 import static ca.bc.gov.gwa.servlet.authentication.GitHubPrincipal.ADMIN_ROLE;
 import static ca.bc.gov.gwa.servlet.authentication.GitHubPrincipal.DEVELOPER_ROLE;
+import static ca.bc.gov.gwa.servlet.authentication.GitHubPrincipal.NS_ADMIN_ROLE;
+import ca.bc.gov.gwa.servlet.authentication.oidc.LookupUtil;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.Collections;
@@ -39,8 +41,11 @@ public class AuthenticationServlet extends BaseServlet {
       data.put("name", gwaPrincipal.getName());
       Set<String> roles = new HashSet();
       roles.add(DEVELOPER_ROLE);
-      //roles.add(ADMIN_ROLE);
       
+      boolean isNsAdmin = LookupUtil.isNamespaceAdmin(LookupUtil.lookupUserProfile(request, response));
+      if (isNsAdmin) {
+          roles.add(NS_ADMIN_ROLE);
+      }
       
       data.put("roles", roles);
       

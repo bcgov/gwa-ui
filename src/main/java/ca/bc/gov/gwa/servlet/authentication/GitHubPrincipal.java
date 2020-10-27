@@ -13,6 +13,7 @@ import org.pac4j.core.profile.UserProfile;
 
 public class GitHubPrincipal extends BasePrincipal {
   public static final String ADMIN_ROLE = "gwa_admin";
+  public static final String NS_ADMIN_ROLE = "gwa_ns_admin";
   public static final String DEVELOPER_ROLE = "gwa_github_developer";
 
   private static final long serialVersionUID = 1L;
