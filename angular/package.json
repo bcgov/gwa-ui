@@ -41,7 +41,7 @@
     "@angular/language-service": "6.1.9",
     "@types/jasmine": "^2.8.17",
     "@types/jasminewd2": "^2.0.8",
-    "@types/node": "^10.17.39",
+    "@types/node": "^10.17.44",
     "codelyzer": "^4.5.0",
     "ng-packagr": "^4.7.1",
     "ts-node": "^7.0.1",

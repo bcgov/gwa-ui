@@ -8,6 +8,7 @@ package ca.bc.gov.gwa.v2.model;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -61,6 +62,14 @@ public class Route {
 //            paths.clear();
 //        }
         
+    }
+
+    public boolean hasPlugin (String name) {
+        return plugins.stream().filter(p -> p.getName().equals(name)).count() != 0;
+    }
+
+    public Optional<Plugin> getPlugin (String name) {
+        return plugins.stream().filter(p -> p.getName().equals(name)).findFirst();
     }
     
     public void addPlugin (Plugin plugin) {

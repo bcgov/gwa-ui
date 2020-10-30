@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -78,6 +79,10 @@ public class Service implements Comparable<Service> {
     
     public boolean hasPlugin (String name) {
         return plugins.stream().filter(p -> p.getName().equals(name)).count() != 0;
+    }
+
+    public Optional<Plugin> getPlugin (String name) {
+        return plugins.stream().filter(p -> p.getName().equals(name)).findFirst();
     }
 
     @Override

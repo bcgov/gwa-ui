@@ -15,6 +15,7 @@ import ca.bc.gov.gwa.v2.conf.GwaSettings;
 import ca.bc.gov.gwa.v2.model.ACL;
 import ca.bc.gov.gwa.v2.model.Group;
 import ca.bc.gov.gwa.v2.model.KongConsumer;
+import ca.bc.gov.gwa.v2.model.KongModel;
 import ca.bc.gov.gwa.v2.model.Plugin;
 import ca.bc.gov.gwa.v2.model.Route;
 import ca.bc.gov.gwa.v2.model.Service;
@@ -28,6 +29,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -41,12 +44,15 @@ import org.pac4j.core.profile.UserProfile;
 @Slf4j
 public class KongAdminService {
 
+    long cacheTime;
+    KongModel cachedModel;
+            
     GwaSettings config;
 
     public KongAdminService(GwaSettings config) {
         this.config = config;
     }
-
+    
     public JsonHttpClient newKongClient() {
         return new JsonHttpClient(config.getKongAdminUrl(), config.getKongAdminUsername(), config.getKongAdminPassword());
     }
@@ -114,10 +120,53 @@ public class KongAdminService {
         return result;
     }
 
+//    public Collection<Plugin> buildPluginModel () throws IOException {
+//        long start = new Date().getTime();
+//        Collection<Plugin> result = new ArrayList<>();
+//        
+//        List<Object> plugins = (List<Object>) plugins().get("data");
+//        for ( Object item : plugins ) {
+//            Plugin plugin = new Plugin(item);
+//            result.add(plugin);
+//        }
+//        long end = new Date().getTime();
+//        System.out.println("Executed in " + (end-start) + " ms");
+//                
+//        return result.stream().collect(Collectors 
+//                            .toCollection(ArrayList::new));
+//    }
+
+    public KongConsumer buildConsumer (String username) throws IOException {
+        final KongConsumer consumer = new KongConsumer (consumer(username));
+        cachedModel.getPlugins().stream().forEach(plugin -> {
+            if (consumer != null && plugin.getConsumerId() != null && plugin.getConsumerId().equals(consumer.getId())) {
+                consumer.addPlugin(plugin);
+            }
+        });
+        return consumer;
+    }
+    
+    public void forceRefresh() throws IOException {
+        cacheTime = new Date().getTime();
+        cachedModel = buildServiceModelCache();
+    }
+    
     public Collection<Service> buildServiceModel () throws IOException {
+        long ms = new Date().getTime();
+        
+        if ((ms - cacheTime) > (60 * 60 * 1000)) {
+            log.debug("Refreshing cache on this request.");
+            cachedModel = buildServiceModelCache();
+            cacheTime = ms;
+        }
+        return cachedModel.getServices();
+    }
+
+    private KongModel buildServiceModelCache () throws IOException {
         long start = new Date().getTime();
         
-
+        KongModel model = new KongModel();
+        
         Map<String, Service> services = new HashMap<>();
         Map<String, Route> routes = new HashMap<>();
         List<Object> serviceObjects = (List<Object>) services().get("data");
@@ -136,6 +185,8 @@ public class KongAdminService {
             routes.put(route.getId(), route);
         }
 
+        List<Plugin> pluginData = new ArrayList<>();
+        
         List<Object> plugins = (List<Object>) plugins().get("data");
         for ( Object item : plugins ) {
             Plugin plugin = new Plugin(item);
@@ -147,8 +198,10 @@ public class KongAdminService {
                 Route route = routes.get(plugin.getRouteId());
                 route.addPlugin(plugin);
             }
+            
+            pluginData.add(plugin);
         }
-        
+
         Collection<Service> serviceValues = services.values();
         
         // Need to backfill this plugin to get the UI to work
@@ -165,8 +218,10 @@ public class KongAdminService {
         long end = new Date().getTime();
         System.out.println("Executed in " + (end-start) + " ms");
                 
-        return services.values().stream().sorted().collect(Collectors 
-                            .toCollection(ArrayList::new));
+        model.setServices(services.values().stream().sorted().collect(Collectors 
+                            .toCollection(ArrayList::new)));
+        model.setPlugins (pluginData);
+        return model;
     }
 
     
@@ -204,6 +259,12 @@ public class KongAdminService {
     public Map<String, Object> consumers() throws IOException {
         JsonHttpClient httpClient = newKongClient();
         return kongPageAll(null, httpClient, "consumers");
+    }
+
+    
+    public Map<String, Object> consumer(String username) throws IOException {
+        JsonHttpClient httpClient = newKongClient();
+        return kongRecord(httpClient, String.format("consumers/%s", username));
     }
 
     public Map<String, Object> plugins() throws IOException {
@@ -358,4 +419,11 @@ public class KongAdminService {
         }
         throw new IllegalArgumentException("Expecting a list for " + key + " not " + value);
     }
+    
+    private Map<String, Object> kongRecord(final JsonHttpClient httpClient, final String path) throws IOException {
+        String urlString = getKongPageUrl(path);
+        final Map<String, Object> kongResponse = httpClient.getByUrl(urlString);
+        return kongResponse;
+    }
+    
 }

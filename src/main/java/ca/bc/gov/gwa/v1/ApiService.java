@@ -15,6 +15,9 @@ import ca.bc.gov.gwa.v2.controllers.GwaController;
 import ca.bc.gov.gwa.v2.model.ACL;
 import ca.bc.gov.gwa.v2.model.Group;
 import ca.bc.gov.gwa.v2.model.KongConsumer;
+import ca.bc.gov.gwa.v2.model.KongModel;
+import ca.bc.gov.gwa.v2.model.Plugin;
+import ca.bc.gov.gwa.v2.model.Route;
 import ca.bc.gov.gwa.v2.model.Service;
 import ca.bc.gov.gwa.v2.services.KongAdminService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -44,6 +47,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
@@ -139,6 +143,7 @@ public class ApiService implements ServletContextListener, GwaConstants {
 
     private boolean useEndpoints = true;
 
+    
     private void addData(final Map<String, Object> data, final Map<String, Object> requestData,
             final List<String> fieldNames) {
         for (final String key : fieldNames) {
@@ -158,14 +163,14 @@ public class ApiService implements ServletContextListener, GwaConstants {
     }
 
     @SuppressWarnings("unchecked")
-    private void addLimits(final Map<String, Object> limits, final Map<String, Object> plugin) {
+    private void addLimits(final Map<String, Object> limits, final Map<String, Object> plugin, String scope) {
         final Map<String, Object> config = (Map<String, Object>) plugin.getOrDefault("config",
                 Collections.emptyMap());
         for (final String fieldName : Arrays.asList("year", "month", "day", "hour", "minute",
                 "second")) {
             final Object fieldValue = config.get(fieldName);
             if (fieldValue != null) {
-                limits.put(fieldName, fieldValue);
+                limits.put(String.format("%s (%s)", fieldName, scope), fieldValue);
             }
         }
     }
@@ -663,50 +668,50 @@ public class ApiService implements ServletContextListener, GwaConstants {
 
             final Set<String> groups = consumerAclGroups(httpClient, userPrincipal.getName());
 
+            GwaController cc = ApiService.getGwaController(httpRequest.getServletContext());
+            KongAdminService kadmin = cc.getKongAdminService();
+
+            Collection<Service> services = kadmin.buildServiceModel();
+            
+            
             final Map<String, Map<String, Object>> apiByName = new TreeMap<>();
 
             LOG.debug("For GROUPS " + groups);
 
             final LinkedList<String> apiIds = new LinkedList<>();
             final String path = "/plugins?name=acl";
-            kongPageAll(httpRequest, httpClient, path, acl -> {
-                LOG.debug("For ACL " + acl);
-                if (acl.get(CONSUMER_ID) == null) {
-                    final Map<String, Object> config = (Map<String, Object>) acl.get(CONFIG);
-                    final List<String> blacklist = getList(config, "blacklist");
-                    final List<String> whitelist = getList(config, WHITELIST);
-                    if (containsAny(blacklist, groups)) {
-                        // Ignore blacklist
-                    } else if (whitelist.isEmpty() || containsAny(whitelist, groups)) {
-                        final String apiId = lookupReferenceId(acl, "service");
+            services.stream().forEach(svc -> {
+                Optional<Plugin> optPlugin = svc.getPlugin("acl");
+                if (optPlugin.isPresent()) {
+                    Plugin plugin = optPlugin.get();
+                    if (plugin.getConsumerId() == null) {
+                        final Map<String, Object> config = plugin.getConfig();
+                        final List<String> blacklist = getList(config, BLACKLIST);
+                        final List<String> whitelist = getList(config, WHITELIST);
+                        if (containsAny(blacklist, groups)) {
+                            // Ignore blacklist
+                        } else if (whitelist.isEmpty() || containsAny(whitelist, groups)) {
 
-                        LOG.debug("ADDED = " + apiId);
-                        apiIds.add(apiId);
-                    } else {
-                        LOG.debug("Empty Handed for " + acl);
+                            final Map<String, Object> maskedServiceDetail = new LinkedHashMap<>();
+                            for (final String fieldName : DEVELOPER_KEY_API_FIELD_NAMES) {
+                                final Object fieldValue = svc.getData().get(fieldName);
+                                if (fieldValue != null) {
+                                    maskedServiceDetail.put(fieldName, fieldValue);
+                                }
+                            }
+                            List<String> hosts = new ArrayList<String>();
+                            for ( Route r : svc.getRoutes()) {
+                                hosts.addAll(r.getHosts());
+                            }
+                            maskedServiceDetail.put("hosts", hosts);
 
-                    }
-                }
-            });
-
-            kongPageAll(httpRequest, httpClient, APIS_PATH, api -> {
-                final String apiId = (String) api.get(ID);
-                if (apiIds.remove(apiId)) {
-                    final String name = (String) api.get(NAME);
-                    final Map<String, Object> devkKeyApi = new LinkedHashMap<>();
-                    for (final String fieldName : DEVELOPER_KEY_API_FIELD_NAMES) {
-                        final Object fieldValue = api.get(fieldName);
-                        if (fieldValue != null) {
-                            devkKeyApi.put(fieldName, fieldValue);
+                            apiByName.put(svc.getName(), maskedServiceDetail);
                         }
                     }
-                    apiByName.put(name, devkKeyApi);
-                    if (apiIds.isEmpty()) {
-                        throw new NoSuchElementException();
-                    }
                 }
             });
 
+            
             final Map<String, Object> kongResponse = new LinkedHashMap<>();
             kongResponse.put(DATA, apiByName.values());
             Json.writeJson(httpResponse, kongResponse);
@@ -720,29 +725,36 @@ public class ApiService implements ServletContextListener, GwaConstants {
 
         final Principal principal = httpRequest.getUserPrincipal();
         final String username = principal.getName();
-        handleRequest(httpResponse, httpClient -> {
-            final String consumerId = consumerIdGetByUsername(httpClient, username);
-            final String consumerPath = APIS_PATH2 + apiName + PLUGINS_PATH
-                    + "?name=rate-limiting&api_id=" + apiId + "&consumer_id=" + consumerId;
-            final Map<String, Object> limits = new LinkedHashMap<>();
-            final Map<String, Object> kongResponse = httpClient.get(consumerPath);
-            final Number total = (Number) kongResponse.getOrDefault("total", 0);
-            if (total.intValue() > 0) {
-                final List<Map<String, Object>> plugins = (List<Map<String, Object>>) kongResponse
-                        .getOrDefault("data", Collections.emptyList());
-                for (final Map<String, Object> plugin : plugins) {
-                    addLimits(limits, plugin);
-                }
-            } else {
-                final Map<String, Object> api = apiGet(apiName, false, false);
-                final Map<String, Object> plugin = pluginGet(api, "rate-limiting");
-                if (plugin != null) {
-                    addLimits(limits, plugin);
-                }
-            }
 
-            Json.writeJson(httpResponse, limits);
+        GwaController cc = ApiService.getGwaController(httpRequest.getServletContext());
+        KongAdminService kadmin = cc.getKongAdminService();
+
+        Collection<Service> services = kadmin.buildServiceModel();
+
+        final Map<String, Object> limits = new LinkedHashMap<>();
+        
+        kadmin.buildConsumer(username).getPlugins().stream().filter(p -> p.getName().equals("rate-limiting")).forEach(plugin -> {
+//            final Number total = (Number) p.getOrDefault("total", 0);
+            addLimits (limits, plugin.getData(), "Consumer");
         });
+        
+        services
+                .stream()
+                .filter(s -> s.getName().equals(apiName))
+                .forEach( svc -> {
+            Optional<Plugin> plugin = svc.getPlugin("rate-limiting");
+            if (plugin.isPresent()) {
+                addLimits (limits, plugin.get().getData(), "Service");
+            }
+            svc.getRoutes().stream().forEach (route -> {
+                Optional<Plugin> rplugin = route.getPlugin("rate-limiting");
+                if (rplugin.isPresent()) {
+                    addLimits (limits, rplugin.get().getData(), "Route");
+                }
+            });
+        });
+        
+        Json.writeJson(httpResponse, limits);
     }
 
     public boolean endpointAccessAllowed(final HttpServletRequest httpRequest,

@@ -28,20 +28,27 @@ import ca.bc.gov.gwa.v2.services.PermissionService;
 import ca.bc.gov.gwa.v2.services.TeamService;
 import java.io.IOException;
 import java.io.PrintWriter;
+import static java.lang.StrictMath.log;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.function.Predicate;
+import java.util.logging.Level;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.conn.HttpHostConnectException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Slf4j
 @WebListener
 public class GwaController implements ServletContextListener, GwaConstants {
 
@@ -57,6 +64,8 @@ public class GwaController implements ServletContextListener, GwaConstants {
     PermissionService permissionService = new PermissionService(config);
     TeamService teamService = new TeamService(config);
     GwaApiService gwaApiService = new GwaApiService(config);
+    
+    Timer timer;
 
     public KongAdminService getKongAdminService() {
         return kongAdminService;
@@ -77,6 +86,7 @@ public class GwaController implements ServletContextListener, GwaConstants {
     @Override
     public void contextDestroyed(final ServletContextEvent event) {
         //this.apiNameById.clear();
+        timer.cancel();
     }
 
     @Override
@@ -85,6 +95,23 @@ public class GwaController implements ServletContextListener, GwaConstants {
         try {
             final ServletContext servletContext = event.getServletContext();
             servletContext.setAttribute(GWA_CONTROLLER, this);
+
+            TimerTask task = new TimerTask() {
+                public void run() {
+                    log.debug("Task performed on: " + new Date() + "n" +
+                      " Thread's name: " + Thread.currentThread().getName());
+                    try {
+                        kongAdminService.forceRefresh();
+                    } catch (IOException ex) {
+                        LOG.error("Refreshing service model had a problem", ex);
+                    }
+                }
+            };
+            timer = new Timer("Timer");
+
+            long frequency = 5 * 60000L;
+            timer.schedule(task, 1000, frequency);
+            
         } catch (final Exception e) {
             LOG.error("Unable to initialize service", e);
             throw e;

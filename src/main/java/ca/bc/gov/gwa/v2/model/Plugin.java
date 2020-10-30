@@ -21,6 +21,7 @@ public class Plugin {
 
     String id;
     String name;
+    String consumerId;
     String routeId;
     String serviceId;
     Map<String, Object> config;
@@ -41,6 +42,9 @@ public class Plugin {
         name = (String) data.get("name");
         tags = new Tags(data);
         
+        if (data.get("consumer") != null) {
+            consumerId = (String) ((Map<String, Object>)data.get("consumer")).get("id");
+        }
         if (data.get("route") != null) {
             routeId = (String) ((Map<String, Object>)data.get("route")).get("id");
         }

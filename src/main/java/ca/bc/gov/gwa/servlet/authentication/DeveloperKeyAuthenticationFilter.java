@@ -24,10 +24,10 @@ import ca.bc.gov.gwa.servlet.AbstractFilter;
 import ca.bc.gov.gwa.v1.ApiService;
 import ca.bc.gov.gwa.util.LruMap;
 
-//@WebFilter(urlPatterns = {
-//  "/git/*", "/logout", "/rest/*", "/ui/*",
+@WebFilter(urlPatterns = {
+  "/git/*", "/logout", "/rest/*", "/ui/*",
 //  "/int/ui/*", "/int/rest/*", "/int/logout", "/int/login/*"
-//})
+})
 public class DeveloperKeyAuthenticationFilter extends AbstractFilter {
 
   private static final int EXPIRY_TIME_MS = 10 * 60 * 1000;

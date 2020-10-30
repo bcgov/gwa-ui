@@ -145,6 +145,8 @@ public interface GwaConstants {
 
   static String VERSION = "version";
 
+  static String BLACKLIST = "deny";
+
   static String WHITELIST = "allow";
 
   static List<String> ACL_FIELD_NAMES = Arrays.asList(WHITELIST);

@@ -20,7 +20,7 @@ import org.pac4j.jee.filter.SecurityFilter;
 
 @WebFilter(
     urlPatterns = {
-        "/git/*", "/logout", "/rest/*", "/ui/*",
+//        "/git/*", "/logout", "/rest/*", "/ui/*",
         "/int/ui/*", "/int/rest/*", "/int/logout", "/int/login/*", "/int/authz/request"
     },
     initParams = {

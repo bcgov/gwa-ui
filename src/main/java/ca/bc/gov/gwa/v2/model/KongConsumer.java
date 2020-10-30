@@ -8,7 +8,10 @@ package ca.bc.gov.gwa.v2.model;
 import static ca.bc.gov.gwa.v2.model.Service.TIME_IN_SECONDS;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -22,6 +25,7 @@ public class KongConsumer {
     @JsonProperty("created_at")
     Long createdAt;
     Tags tags;
+    List<Plugin> plugins;
     
     Map<String, Object> data;
         
@@ -33,7 +37,14 @@ public class KongConsumer {
         customId = (String) data.get("custom_id");
         tags = new Tags(data);
         
+        plugins = new ArrayList<>();
+
         createdAt = ( (BigDecimal) data.get("created_at")).longValue() * (TIME_IN_SECONDS ? 1000:1);
 
     }
+    
+    public void addPlugin (Plugin plugin) {
+        plugins.add(plugin);
+    }
+    
 }
