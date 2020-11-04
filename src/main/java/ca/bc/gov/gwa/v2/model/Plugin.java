@@ -53,6 +53,8 @@ public class Plugin {
         }
         config = (Map<String, Object>) data.get("config");
         
+        mask_config (config);
+        
     }
     
     public List<String> getConfigStringArray (String attrName) {
@@ -63,6 +65,14 @@ public class Plugin {
             return new ArrayList<>();
         } else {
             return Arrays.asList((String[]) value);
+        }
+    }
+    
+    private void mask_config (Map<String, Object> conf) {
+        for (String key : conf.keySet()) {
+            if (key.startsWith("redis_")) {
+                conf.put(key, "****");
+            }
         }
     }
 }

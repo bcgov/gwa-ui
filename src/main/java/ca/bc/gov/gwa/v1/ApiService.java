@@ -846,11 +846,9 @@ public class ApiService implements ServletContextListener, GwaConstants {
         GwaController cc = ApiService.getGwaController(httpRequest.getServletContext());
         KongAdminService kadmin = cc.getKongAdminService();
 
-        System.out.println(groupName);
-        
         //Json.writeJson(httpResponse, kadmin.services());
 
-        final List<KongConsumer> consumers = new ArrayList<>();
+        final List<ACL> consumerACLs = new ArrayList<>();
         
         final Map<String, Object> kongResponse;
         //final List<Collection<Service>> allEndpoints = new ArrayList<>();
@@ -863,13 +861,13 @@ public class ApiService implements ServletContextListener, GwaConstants {
                 System.out.println("MATCH" + group);
                 for ( ACL acl : group.getMembership()) {
                     System.out.println("Membership?"+acl);
-                    consumers.add(acl.getConsumer());
+                    consumerACLs.add(acl);
                 }
             }
         }
         kongResponse = new LinkedHashMap<>();
-        kongResponse.put(DATA, consumers);
-        kongResponse.put(TOTAL, consumers.size());
+        kongResponse.put(DATA, consumerACLs);
+        kongResponse.put(TOTAL, consumerACLs.size());
         ObjectMapper mapper = new ObjectMapper();
         mapper.writeValue(httpResponse.getOutputStream(), kongResponse);
 
@@ -1261,7 +1259,7 @@ public class ApiService implements ServletContextListener, GwaConstants {
     public String getGitHubAccessToken(final String state, final String code) throws IOException {
         final String accessToken;
         try (
-                JsonHttpClient client = new JsonHttpClient("https://github.com")) {
+                JsonHttpClient client = new JsonHttpClient("https://github.com", this.gitHubClientSecret)) {
             final Map<String, Object> accessResponse = client
                     .get("/login/oauth/access_token?client_id=" + this.gitHubClientId + "&client_secret="
                             + this.gitHubClientSecret + "&code=" + code + "&state=" + state);
@@ -1400,9 +1398,8 @@ public class ApiService implements ServletContextListener, GwaConstants {
             final GitHubPrincipal gitHubPrincipal = (GitHubPrincipal) userPrincipal;
             final String username = gitHubPrincipal.getLogin();
             try (
-                    JsonHttpClient client = new JsonHttpClient("https://api.github.com")) {
-                final String path = "/orgs/" + this.gitHubOrganizationName + "/memberships/" + username
-                        + "?access_token=" + this.gitHubAccessToken;
+                    JsonHttpClient client = new JsonHttpClient("https://api.github.com", this.gitHubAccessToken)) {
+                final String path = "/orgs/" + this.gitHubOrganizationName + "/memberships/" + username;
                 client.put(path);
                 addGitHubDeveloperGroup(gitHubPrincipal);
                 gitHubPrincipal.addDeveloperRole();

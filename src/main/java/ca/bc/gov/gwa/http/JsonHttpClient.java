@@ -33,8 +33,13 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 
 import ca.bc.gov.gwa.util.Json;
+import com.google.common.collect.Lists;
 import com.nimbusds.oauth2.sdk.token.BearerAccessToken;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import org.apache.http.Header;
+import org.apache.http.message.BasicHeader;
 
 public class JsonHttpClient implements Closeable {
   private final String serviceUrl;
@@ -45,6 +50,17 @@ public class JsonHttpClient implements Closeable {
     this(serviceUrl, null, null);
   }
 
+  public JsonHttpClient(final String serviceUrl, final String token) {
+    this.serviceUrl = serviceUrl;
+
+    final HttpClientBuilder clientBuilder = HttpClients.custom();
+    if (token != null) {
+      Collection<Header> defaultHeaders = Lists.newArrayList(new BasicHeader("Authorization", String.format("token %s", token)));
+      clientBuilder.setDefaultHeaders(defaultHeaders);
+    }
+    this.httpClient = clientBuilder.build();
+  }
+  
   public JsonHttpClient(final String serviceUrl, final String username, final String password) {
     this.serviceUrl = serviceUrl;
 

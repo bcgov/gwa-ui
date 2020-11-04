@@ -23,11 +23,14 @@ import ca.bc.gov.gwa.http.JsonHttpClient;
 import ca.bc.gov.gwa.servlet.AbstractFilter;
 import ca.bc.gov.gwa.v1.ApiService;
 import ca.bc.gov.gwa.util.LruMap;
+import lombok.extern.slf4j.Slf4j;
 
 @WebFilter(urlPatterns = {
-  "/git/*", "/logout", "/rest/*", "/ui/*",
+    "/nowhere"
+//  "/git/*", "/logout", "/rest/*", "/ui/*",
 //  "/int/ui/*", "/int/rest/*", "/int/logout", "/int/login/*"
 })
+@Slf4j
 public class DeveloperKeyAuthenticationFilter extends AbstractFilter {
 
   private static final int EXPIRY_TIME_MS = 10 * 60 * 1000;
@@ -40,9 +43,8 @@ public class DeveloperKeyAuthenticationFilter extends AbstractFilter {
 
  
   @SuppressWarnings("unchecked")
-  private void addGitHubGroups(final JsonHttpClient client, final String accessToken,
-    final Set<String> groups) throws IOException {
-    final Object orgResponse = client.get("/user/orgs?access_token=" + accessToken);
+  private void addGitHubGroups(final JsonHttpClient client, final Set<String> groups) throws IOException {
+    final Object orgResponse = client.get("/user/orgs");
     if (orgResponse instanceof List) {
       final List<Map<String, Object>> orgList = (List<Map<String, Object>>)orgResponse;
       for (final Map<String, Object> organization : orgList) {
@@ -57,6 +59,7 @@ public class DeveloperKeyAuthenticationFilter extends AbstractFilter {
   @Override
   public void doFilter(final ServletRequest request, final ServletResponse response,
     final FilterChain chain) throws IOException, ServletException {
+      log.info("FILTER!");
     if (request.getAttribute("gwaDeveloperKeyFiltered") == null) {
       request.setAttribute("gwaDeveloperKeyFiltered", Boolean.TRUE);
       final HttpServletRequest httpRequest = (HttpServletRequest)request;
@@ -128,8 +131,8 @@ public class DeveloperKeyAuthenticationFilter extends AbstractFilter {
       if (redirectUrl != null) {
         final String accessToken = this.apiService.getGitHubAccessToken(state, code);
         try (
-          JsonHttpClient client = new JsonHttpClient("https://api.github.com")) {
-          final Map<String, Object> userResponse = client.get("/user?access_token=" + accessToken);
+          JsonHttpClient client = new JsonHttpClient("https://api.github.com", accessToken)) {
+          final Map<String, Object> userResponse = client.get("/user");
           final Number id = (Number)userResponse.get("id");
           final String login = (String)userResponse.get("login");
           if (id != null && login != null) {
@@ -140,7 +143,7 @@ public class DeveloperKeyAuthenticationFilter extends AbstractFilter {
               return;
 
             } else {
-              addGitHubGroups(client, accessToken, groups);
+              addGitHubGroups(client, groups);
               final Set<String> kongGroups = this.apiService.userGroups(userId, username);
               final GitHubPrincipal principal = new GitHubPrincipal(userId, login, username,
                 groups);

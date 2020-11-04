@@ -154,7 +154,7 @@ public class KongAdminService {
     public Collection<Service> buildServiceModel () throws IOException {
         long ms = new Date().getTime();
         
-        if ((ms - cacheTime) > (60 * 60 * 1000)) {
+        if ((ms - cacheTime) > (20 * 60 * 1000)) {
             log.debug("Refreshing cache on this request.");
             cachedModel = buildServiceModelCache();
             cacheTime = ms;
