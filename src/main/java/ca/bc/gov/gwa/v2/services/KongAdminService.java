@@ -138,7 +138,8 @@ public class KongAdminService {
 
     public KongConsumer buildConsumer (String username) throws IOException {
         final KongConsumer consumer = new KongConsumer (consumer(username));
-        cachedModel.getPlugins().stream().forEach(plugin -> {
+        KongModel model = buildKongModel();
+        model.getPlugins().stream().forEach(plugin -> {
             if (consumer != null && plugin.getConsumerId() != null && plugin.getConsumerId().equals(consumer.getId())) {
                 consumer.addPlugin(plugin);
             }
@@ -152,6 +153,10 @@ public class KongAdminService {
     }
     
     public Collection<Service> buildServiceModel () throws IOException {
+        return c.getServices();
+    }
+
+    public KongModel buildKongModel () throws IOException {
         long ms = new Date().getTime();
         
         if ((ms - cacheTime) > (20 * 60 * 1000)) {
@@ -159,9 +164,10 @@ public class KongAdminService {
             cachedModel = buildServiceModelCache();
             cacheTime = ms;
         }
-        return cachedModel.getServices();
+        return cachedModel;
     }
 
+    
     private KongModel buildServiceModelCache () throws IOException {
         long start = new Date().getTime();
         
