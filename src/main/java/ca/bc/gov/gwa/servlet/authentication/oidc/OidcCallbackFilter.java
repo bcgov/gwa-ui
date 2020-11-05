@@ -18,9 +18,11 @@ import javax.servlet.annotation.WebFilter;
 import javax.servlet.annotation.WebInitParam;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.pac4j.core.profile.UserProfile;
 import org.pac4j.jee.filter.CallbackFilter;
 
+@Slf4j
 @WebFilter(urlPatterns = {
     "/callback"
 },
@@ -40,6 +42,7 @@ public class OidcCallbackFilter extends CallbackFilter {
 
         UserProfile profile = LookupUtil.lookupUserProfile(request, response);
 
+        log.info("OIDC Callback " + profile);
         if (profile != null) {
             // Auto-register the Consumer on Kong
             //System.out.println("Auto Reg " + profile.getId() + " : " + profile.getUsername());

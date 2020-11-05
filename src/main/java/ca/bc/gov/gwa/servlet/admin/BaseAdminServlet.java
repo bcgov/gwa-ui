@@ -9,14 +9,17 @@ import javax.servlet.http.HttpServletResponse;
 import ca.bc.gov.gwa.v1.ApiService;
 import ca.bc.gov.gwa.servlet.BaseServlet;
 import ca.bc.gov.gwa.servlet.authentication.oidc.LookupUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.pac4j.core.profile.CommonProfile;
 
+@Slf4j
 public abstract class BaseAdminServlet extends BaseServlet {
   private static final long serialVersionUID = 1L;
 
   @Override
   protected void service(final HttpServletRequest request, final HttpServletResponse response)
     throws ServletException, IOException {
+      log.info("Has Role? ");
     if (hasRole(request, response, ApiService.ROLE_GWA_ADMIN)) {
       super.service(request, response);
     }

@@ -153,7 +153,7 @@ public class KongAdminService {
     }
     
     public Collection<Service> buildServiceModel () throws IOException {
-        return c.getServices();
+        return buildKongModel().getServices();
     }
 
     public KongModel buildKongModel () throws IOException {

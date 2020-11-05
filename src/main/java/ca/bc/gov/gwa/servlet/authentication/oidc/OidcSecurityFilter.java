@@ -16,8 +16,10 @@ import javax.servlet.annotation.WebInitParam;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import lombok.extern.slf4j.Slf4j;
 import org.pac4j.jee.filter.SecurityFilter;
 
+@Slf4j
 @WebFilter(
     urlPatterns = {
       "/git/*", "/logout", "/rest/*", "/ui/*", "/login/*",
@@ -33,6 +35,7 @@ public class OidcSecurityFilter extends SecurityFilter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         final String servletPath = ((HttpServletRequest) request).getServletPath();
 
+        log.info("Security Filter " + servletPath);
         final HttpSession session = ((HttpServletRequest)request).getSession(false);
 //        if (session == null) {
 //            HttpServletResponse resp = ((HttpServletResponse)response);
