@@ -132,6 +132,8 @@ public class ApiService implements ServletContextListener, GwaConstants {
     private String kongAdminUrl = "http://localhost:8001";
 
     private String kongAdminUsername = null;
+    
+    private String grafanaUrl = null;
 
     private final Map<String, Map<String, Map<String, Object>>> objectByTypeAndId = new HashMap<>();
 
@@ -143,7 +145,6 @@ public class ApiService implements ServletContextListener, GwaConstants {
 
     private boolean useEndpoints = true;
 
-    
     private void addData(final Map<String, Object> data, final Map<String, Object> requestData,
             final List<String> fieldNames) {
         for (final String key : fieldNames) {
@@ -542,6 +543,7 @@ public class ApiService implements ServletContextListener, GwaConstants {
             this.gitHubClientSecret = getConfig("gwaGitHubClientSecret");
             this.apiKeyExpiryDays = Integer.parseInt(getConfig("gwaApiKeyExpiryDays", "90"));
             this.useEndpoints = !"false".equals(getConfig("gwaUseEndpoints", "true"));
+            this.grafanaUrl = getConfig("grafanaUrl");
 
             if (this.gitHubClientId == null || this.gitHubClientSecret == null) {
                 LoggerFactory.getLogger(getClass())
@@ -659,6 +661,10 @@ public class ApiService implements ServletContextListener, GwaConstants {
         keyAuth.put("maxAgeDays", this.apiKeyExpiryDays);
     }
 
+    public String getGrafanaUrl() {
+        return grafanaUrl;
+    }
+
     @SuppressWarnings("unchecked")
     public void developerApiList(final HttpServletRequest httpRequest,
             final HttpServletResponse httpResponse) {
@@ -672,8 +678,7 @@ public class ApiService implements ServletContextListener, GwaConstants {
             KongAdminService kadmin = cc.getKongAdminService();
 
             Collection<Service> services = kadmin.buildServiceModel();
-            
-            
+
             final Map<String, Map<String, Object>> apiByName = new TreeMap<>();
 
             LOG.debug("For GROUPS " + groups);
@@ -700,7 +705,7 @@ public class ApiService implements ServletContextListener, GwaConstants {
                                 }
                             }
                             List<String> hosts = new ArrayList<String>();
-                            for ( Route r : svc.getRoutes()) {
+                            for (Route r : svc.getRoutes()) {
                                 hosts.addAll(r.getHosts());
                             }
                             maskedServiceDetail.put("hosts", hosts);
@@ -711,7 +716,6 @@ public class ApiService implements ServletContextListener, GwaConstants {
                 }
             });
 
-            
             final Map<String, Object> kongResponse = new LinkedHashMap<>();
             kongResponse.put(DATA, apiByName.values());
             Json.writeJson(httpResponse, kongResponse);
@@ -732,28 +736,28 @@ public class ApiService implements ServletContextListener, GwaConstants {
         Collection<Service> services = kadmin.buildServiceModel();
 
         final Map<String, Object> limits = new LinkedHashMap<>();
-        
+
         kadmin.buildConsumer(username).getPlugins().stream().filter(p -> p.getName().equals("rate-limiting")).forEach(plugin -> {
 //            final Number total = (Number) p.getOrDefault("total", 0);
-            addLimits (limits, plugin.getData(), "Consumer");
+            addLimits(limits, plugin.getData(), "Consumer");
         });
-        
+
         services
                 .stream()
                 .filter(s -> s.getName().equals(apiName))
-                .forEach( svc -> {
-            Optional<Plugin> plugin = svc.getPlugin("rate-limiting");
-            if (plugin.isPresent()) {
-                addLimits (limits, plugin.get().getData(), "Service");
-            }
-            svc.getRoutes().stream().forEach (route -> {
-                Optional<Plugin> rplugin = route.getPlugin("rate-limiting");
-                if (rplugin.isPresent()) {
-                    addLimits (limits, rplugin.get().getData(), "Route");
-                }
-            });
-        });
-        
+                .forEach(svc -> {
+                    Optional<Plugin> plugin = svc.getPlugin("rate-limiting");
+                    if (plugin.isPresent()) {
+                        addLimits(limits, plugin.get().getData(), "Service");
+                    }
+                    svc.getRoutes().stream().forEach(route -> {
+                        Optional<Plugin> rplugin = route.getPlugin("rate-limiting");
+                        if (rplugin.isPresent()) {
+                            addLimits(limits, rplugin.get().getData(), "Route");
+                        }
+                    });
+                });
+
         Json.writeJson(httpResponse, limits);
     }
 
@@ -802,7 +806,6 @@ public class ApiService implements ServletContextListener, GwaConstants {
 //        }
 //        return false;
 //    }
-
     @SuppressWarnings("unchecked")
     public void endpointDelete(final HttpServletRequest httpRequest,
             final HttpServletResponse httpResponse, final String endpointId) {
@@ -847,9 +850,8 @@ public class ApiService implements ServletContextListener, GwaConstants {
         KongAdminService kadmin = cc.getKongAdminService();
 
         //Json.writeJson(httpResponse, kadmin.services());
-
         final List<ACL> consumerACLs = new ArrayList<>();
-        
+
         final Map<String, Object> kongResponse;
         //final List<Collection<Service>> allEndpoints = new ArrayList<>();
         //allEndpoints.add(kadmin.buildServiceModel());
@@ -859,8 +861,8 @@ public class ApiService implements ServletContextListener, GwaConstants {
         for (Group group : groups) {
             if (group.getGroup().equals(groupName)) {
                 System.out.println("MATCH" + group);
-                for ( ACL acl : group.getMembership()) {
-                    System.out.println("Membership?"+acl);
+                for (ACL acl : group.getMembership()) {
+                    System.out.println("Membership?" + acl);
                     consumerACLs.add(acl);
                 }
             }
@@ -879,16 +881,15 @@ public class ApiService implements ServletContextListener, GwaConstants {
         } else {
             sendError(httpResponse, HttpServletResponse.SC_NOT_FOUND);
         }
-        */
+         */
     }
 
     public void groupsList(final HttpServletRequest httpRequest,
             final HttpServletResponse httpResponse) throws IOException {
         GwaController cc = ApiService.getGwaController(httpRequest.getServletContext());
         KongAdminService kadmin = cc.getKongAdminService();
-        
-        //Json.writeJson(httpResponse, kadmin.services());
 
+        //Json.writeJson(httpResponse, kadmin.services());
         final Map<String, Object> kongResponse;
         //final List<Collection<Service>> allEndpoints = new ArrayList<>();
         //allEndpoints.add(kadmin.buildServiceModel());
@@ -909,7 +910,7 @@ public class ApiService implements ServletContextListener, GwaConstants {
         } else {
             sendError(httpResponse, HttpServletResponse.SC_NOT_FOUND);
         }
-        */
+         */
     }
 
     /**
@@ -963,7 +964,6 @@ public class ApiService implements ServletContextListener, GwaConstants {
         KongAdminService kadmin = cc.getKongAdminService();
 
         //Json.writeJson(httpResponse, kadmin.services());
-
         final Map<String, Object> kongResponse;
         //final List<Collection<Service>> allEndpoints = new ArrayList<>();
         //allEndpoints.add(kadmin.buildServiceModel());
@@ -979,7 +979,7 @@ public class ApiService implements ServletContextListener, GwaConstants {
         ObjectMapper mapper = new ObjectMapper();
         mapper.writeValue(httpResponse.getOutputStream(), match);
     }
-    
+
     @SuppressWarnings("unchecked")
     public void endpointList(final HttpServletRequest httpRequest,
             final HttpServletResponse httpResponse) throws IOException {
@@ -988,22 +988,23 @@ public class ApiService implements ServletContextListener, GwaConstants {
         KongAdminService kadmin = cc.getKongAdminService();
 
         //Json.writeJson(httpResponse, kadmin.services());
-
         final Map<String, Object> kongResponse;
         //final List<Collection<Service>> allEndpoints = new ArrayList<>();
         //allEndpoints.add(kadmin.buildServiceModel());
 //        Map<String, Object> allEndpoints = kadmin.services();
         Collection<Service> services = kadmin.buildServiceModel();
 
-        Collection<Service> returnedServices = kadmin.filterServicesByPermissions (services, LookupUtil.lookupUserProfile(httpRequest, httpResponse));
+        Collection<Service> returnedServices = kadmin.filterServicesByPermissions(services, LookupUtil.lookupUserProfile(httpRequest, httpResponse));
 
         kongResponse = new LinkedHashMap<>();
         kongResponse.put(DATA, returnedServices);
         kongResponse.put(TOTAL, returnedServices.size());
         ObjectMapper mapper = new ObjectMapper();
         mapper.writeValue(httpResponse.getOutputStream(), kongResponse);
-        
-        if (true) return;
+
+        if (true) {
+            return;
+        }
         handleRequest(httpResponse, httpClient -> {
             final Principal principal = httpRequest.getUserPrincipal();
             final UserProfile user = LookupUtil.lookupUserProfile(httpRequest, httpResponse);
@@ -1101,7 +1102,7 @@ public class ApiService implements ServletContextListener, GwaConstants {
                                         }
                                     }
                                 }
-                                */
+                                 */
                             }
 
                         }
@@ -1433,8 +1434,6 @@ public class ApiService implements ServletContextListener, GwaConstants {
         final String path = CONSUMERS_PATH2 + username + "/acls/" + groupName;
         handleDelete(httpResponse, path);
     }
-
-
 
     public void handleAdd(final HttpServletRequest httpRequest,
             final HttpServletResponse httpResponse, final String path) {

@@ -78,6 +78,9 @@ import {NamespaceService} from './Namespace/namespace.service';
 import {NamespaceViewComponent} from './Namespace/namespace-view.component';
 import { NewNamespaceDialogComponent} from './Namespace/new-dialog';
 
+import {MetricsViewComponent} from './Metrics/metrics-view.component';
+import {MetricsService} from './Metrics/metrics.service';
+
 import {EndpointViewTabsComponent} from './Endpoint/endpoint-view-tabs.component';
 import {EndpointViewComponent} from './Endpoint/endpoint-view.component';
 import {EndpointListComponent} from './Endpoint/endpoint-list.component';
@@ -141,6 +144,10 @@ import {AdminRoutingModule} from './admin-routing.module';
         {
           title: 'Services',
           routerLink: 'ui/endpoints'
+        },
+        {
+            title: 'Metrics',
+            routerLink: 'ui/metrics'
         },
         {
             title: 'Service Accounts',
@@ -209,7 +216,8 @@ import {AdminRoutingModule} from './admin-routing.module';
     ServiceAccountListComponent,
     NamespaceViewComponent,
     RegDialogComponent,
-    NewNamespaceDialogComponent
+    NewNamespaceDialogComponent,
+    MetricsViewComponent
 
   ],
   providers: [
@@ -235,6 +243,7 @@ import {AdminRoutingModule} from './admin-routing.module';
     EndpointService,
     ServiceAccountService,
     NamespaceService,
+    MetricsService,
     GroupService,
     GroupUserService,
     PluginService,

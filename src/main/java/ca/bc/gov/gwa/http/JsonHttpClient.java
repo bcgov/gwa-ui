@@ -1,5 +1,8 @@
 package ca.bc.gov.gwa.http;
 
+import ca.bc.gov.gwa.util.Json;
+import com.google.common.collect.Lists;
+import com.nimbusds.oauth2.sdk.token.BearerAccessToken;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,10 +11,13 @@ import java.io.Reader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
-
+import lombok.extern.slf4j.Slf4j;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.StatusLine;
 import org.apache.http.auth.AuthScope;
@@ -31,16 +37,9 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
-
-import ca.bc.gov.gwa.util.Json;
-import com.google.common.collect.Lists;
-import com.nimbusds.oauth2.sdk.token.BearerAccessToken;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 
+@Slf4j
 public class JsonHttpClient implements Closeable {
   private final String serviceUrl;
 
@@ -145,9 +144,16 @@ public class JsonHttpClient implements Closeable {
       final int statusCode = statusLine.getStatusCode();
       if (statusCode == 200 || statusCode == 201) {
         return getContentJson(updateResponse);
+      } else if (statusCode == 400) {
+        final String message = statusLine.getReasonPhrase();
+        final Map<String,Object> body = getContentJson(updateResponse);
+        log.debug("ExecuteRequest 400 Failure {} {}", message, body.get("error"));
+        throw new HttpStatusException(httpRequest, statusCode, message, (String) body.get("error"));
+          
       } else {
         final String message = statusLine.getReasonPhrase();
         final String body = getContent(updateResponse);
+        log.debug("executeRequest Failure {} {} {}", statusCode, message, body);
         throw new HttpStatusException(httpRequest, statusCode, message, body);
       }
     }
@@ -162,6 +168,7 @@ public class JsonHttpClient implements Closeable {
     return executeRequest(httpRequest);
   }
 
+  
   public <V> V get(final String path) throws IOException {
     final String url = this.serviceUrl + path;
     return getByUrl(url);

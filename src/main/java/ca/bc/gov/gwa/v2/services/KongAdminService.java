@@ -159,7 +159,7 @@ public class KongAdminService {
     public KongModel buildKongModel () throws IOException {
         long ms = new Date().getTime();
         
-        if ((ms - cacheTime) > (20 * 60 * 1000)) {
+        if ((ms - cacheTime) > (20 * 1000)) {
             log.debug("Refreshing cache on this request.");
             cachedModel = buildServiceModelCache();
             cacheTime = ms;
@@ -167,7 +167,6 @@ public class KongAdminService {
         return cachedModel;
     }
 
-    
     private KongModel buildServiceModelCache () throws IOException {
         long start = new Date().getTime();
         
@@ -210,17 +209,6 @@ public class KongAdminService {
 
         Collection<Service> serviceValues = services.values();
         
-        // Need to backfill this plugin to get the UI to work
-        // Should remove ASAP as its silly to put it in, but want to limit
-        // the UI work.
-        for ( Service service : serviceValues ) {
-            if (!service.hasPlugin("bcgov-gwa-endpoint")) {
-                Plugin plugin = new Plugin("bcgov-gwa-endpoint");
-                plugin.getConfig().put("api_owners", new String[0]);
-                service.addPlugin(plugin);
-            }
-        }
-        
         long end = new Date().getTime();
         System.out.println("Executed in " + (end-start) + " ms");
                 
@@ -236,6 +224,7 @@ public class KongAdminService {
         
         log.debug("FILTER BY {} using namespace {}", services.size(), ns);
         if (profile.getAttribute(LookupUtil.NAMESPACE_CLAIM) == null) {
+            log.warn("User missing the namespace is odd!");
             return new ArrayList<>();
         } else {
             return services.stream()

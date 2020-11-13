@@ -7,7 +7,7 @@ import {
 
 import {RegDialogComponent} from './regen-dialog';
 
-import {BaseListComponent} from 'revolsys-angular-framework';
+import {BaseListComponent, DeleteDialogComponent} from 'revolsys-angular-framework';
 
 import {ServiceAccount} from './ServiceAccount';
 import {ServiceAccountService} from './service-account.service';
@@ -46,7 +46,7 @@ export class ServiceAccountListComponent extends BaseListComponent<ServiceAccoun
         this.appName = params['appName'];
         this.appRedirectUrl = params['appRedirectUrl'];
         this.appSendMessage = params['appSendMessage'] === 'true';
-        this.refresh();
+        //this.refresh();
       });
     super.ngOnInit();
   }
@@ -58,15 +58,38 @@ export class ServiceAccountListComponent extends BaseListComponent<ServiceAccoun
     ).subscribe(
       serviceAccount2 => {
         this.hasServiceAccount = true;
-        this.refresh();
         this.serviceAccount = serviceAccount2;
+        if (serviceAccount2) {
+            this.refresh();
+        }
       }
       );
   }
 
   deleteServiceAccount(serviceAccount: ServiceAccount): void {
-    let s = this.service;
-    this.deleteObject(serviceAccount);
+    this.serviceAccount = null;
+    this.deleteObjectCustom(serviceAccount);
+  }
+
+  deleteObjectCustom(record: ServiceAccount): void {
+    const dialogRef = this.dialog.open(DeleteDialogComponent, {
+      data: {
+        typeTitle: this.deleteRecordTitle || this.service.getTypeTitle(),
+        objectLabel: this.service.getLabel(record),
+      }
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result === 'Delete') {
+        this.deleteObjectDoCustom(record);
+      }
+    });
+  }
+
+  deleteObjectDoCustom(record: ServiceAccount): void {
+    this.service.deleteObject(record, this.path)
+      .subscribe((deleted) => {
+          this.refresh();
+      })
   }
 
   regenerateCredentials(serviceAccount: ServiceAccount): void {

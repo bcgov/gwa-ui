@@ -39,6 +39,8 @@ import {UserPluginListComponent} from './User/Plugin/user-plugin-list.component'
 import {ServiceAccountListComponent} from './ServiceAccount/service-account-list.component';
 import {NamespaceViewComponent} from './Namespace/namespace-view.component';
 
+import {MetricsViewComponent} from './Metrics/metrics-view.component';
+
 import {EndpointListComponent} from './Endpoint/endpoint-list.component';
 import {EndpointViewTabsComponent} from './Endpoint/endpoint-view-tabs.component';
 import {EndpointResolver} from './Endpoint/endpoint.resolver';
@@ -76,6 +78,7 @@ const routes: Routes = [
   
   {path: 'ui/serviceAccounts', component: ServiceAccountListComponent, canActivate: [RoleGuard], data: {roles: ['gwa_ns_admin']}},
   {path: 'ui/namespaces', component: NamespaceViewComponent},
+  {path: 'ui/metrics', component: MetricsViewComponent},
 
   {path: '**', component: PageNotFoundComponent}
 ];

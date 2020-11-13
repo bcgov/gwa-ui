@@ -16,6 +16,7 @@ export class ServiceAccountService extends BaseService<ServiceAccount> {
     this.path = '/serviceAccounts';
     this.typeTitle = 'Service Account';
     this.labelFieldName = 'key';
+    this.usePostForDelete = false;
   }
 
 
@@ -26,8 +27,7 @@ export class ServiceAccountService extends BaseService<ServiceAccount> {
     );
   }
 
-
-  deleteObject(serviceAccount: ServiceAccount, path?: string): Observable<boolean> {
+  deleteObject(serviceAccount: ServiceAccount): Observable<boolean> {
     return this.deleteObjectDo(
       `/serviceAccounts/${serviceAccount.key}`
     );

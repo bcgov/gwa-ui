@@ -48,7 +48,11 @@ public class NamespacesServlet extends BaseServlet {
     try {
         cc.getGwaApiService().createNamespace(LookupUtil.lookupUserProfile(request, response), name);
     } catch (HttpStatusException ex) {
-        apiService.writeJsonError(response, ex.getMessage(), ex);
+        if (ex.getCode() == 400) {
+            apiService.writeJsonError(response, ex.getBody(), ex);
+        } else {
+            apiService.writeJsonError(response, ex.getMessage(), ex);
+        }
     }
     
     Json.writeJson(response, Collections.emptyMap());

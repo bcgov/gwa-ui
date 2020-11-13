@@ -60,6 +60,8 @@ public class GwaSettings {
     
     private String keycloakPassword;
     
+    private String grafanaUrl;
+    
     private String gwaApiUrl;
 
     public Map<String, Object> getConfig() {
@@ -149,6 +151,10 @@ public class GwaSettings {
     public String getGwaApiUrl() {
         return gwaApiUrl;
     }
+
+    public String getGrafanaUrl() {
+        return grafanaUrl;
+    }
     
     
     
@@ -180,6 +186,8 @@ public class GwaSettings {
             this.keycloakPassword = getConfig("keycloakPassword");
 
             this.gwaApiUrl = getConfig("gwaApiUrl");
+
+            this.grafanaUrl = getConfig("grafanaUrl");
             
             if (this.oidcClientId == null || this.oidcClientSecret == null) {
                 LoggerFactory.getLogger(getClass())
