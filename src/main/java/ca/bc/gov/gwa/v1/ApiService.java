@@ -684,7 +684,7 @@ public class ApiService implements ServletContextListener, GwaConstants {
             LOG.debug("For GROUPS " + groups);
 
             final LinkedList<String> apiIds = new LinkedList<>();
-            final String path = "/plugins?name=acl";
+            //final String path = "/plugins?name=acl";
             services.stream().forEach(svc -> {
                 Optional<Plugin> optPlugin = svc.getPlugin("acl");
                 if (optPlugin.isPresent()) {
@@ -696,23 +696,12 @@ public class ApiService implements ServletContextListener, GwaConstants {
                         if (containsAny(blacklist, groups)) {
                             // Ignore blacklist
                         } else if (whitelist.isEmpty() || containsAny(whitelist, groups)) {
-
-                            final Map<String, Object> maskedServiceDetail = new LinkedHashMap<>();
-                            for (final String fieldName : DEVELOPER_KEY_API_FIELD_NAMES) {
-                                final Object fieldValue = svc.getData().get(fieldName);
-                                if (fieldValue != null) {
-                                    maskedServiceDetail.put(fieldName, fieldValue);
-                                }
-                            }
-                            List<String> hosts = new ArrayList<String>();
-                            for (Route r : svc.getRoutes()) {
-                                hosts.addAll(r.getHosts());
-                            }
-                            maskedServiceDetail.put("hosts", hosts);
-
-                            apiByName.put(svc.getName(), maskedServiceDetail);
+                            apiByName.put(svc.getName(), maskServiceDetails(svc));
                         }
                     }
+                } else if (svc.getTags().contains("public")) {
+                    apiByName.put(svc.getName(), maskServiceDetails(svc));
+                    
                 }
             });
 
@@ -722,6 +711,22 @@ public class ApiService implements ServletContextListener, GwaConstants {
         });
     }
 
+    private Map<String,Object> maskServiceDetails (Service svc) {
+        final Map<String, Object> maskedServiceDetail = new LinkedHashMap<>();
+        for (final String fieldName : DEVELOPER_KEY_API_FIELD_NAMES) {
+            final Object fieldValue = svc.getData().get(fieldName);
+            if (fieldValue != null) {
+                maskedServiceDetail.put(fieldName, fieldValue);
+            }
+        }
+        List<String> hosts = new ArrayList<String>();
+        for (Route r : svc.getRoutes()) {
+            hosts.addAll(r.getHosts());
+        }
+        maskedServiceDetail.put("hosts", hosts);
+        return maskedServiceDetail;
+    }
+    
     @SuppressWarnings("unchecked")
     public void developerApiRateLimitGet(final HttpServletRequest httpRequest,
             final HttpServletResponse httpResponse, final String apiName) throws IOException {

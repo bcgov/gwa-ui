@@ -33,7 +33,7 @@ import org.pac4j.core.util.Pac4jConstants;
 public class LookupUtil {
     static public final String NAMESPACE_CLAIM = "namespace";
             
-    static public CommonProfile lookupUserProfile(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    static public CommonProfile lookupUserProfile(HttpServletRequest request, HttpServletResponse response) {
         final WebContext webContext = new JEEContext(request, response);
 
         ProfileManager<CommonProfile> profileManager = new ProfileManager(webContext);
