@@ -16,12 +16,14 @@ import javax.servlet.annotation.WebInitParam;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import lombok.extern.slf4j.Slf4j;
 import org.pac4j.jee.filter.SecurityFilter;
 
+@Slf4j
 @WebFilter(
     urlPatterns = {
-//        "/git/*", "/logout", "/rest/*", "/ui/*",
-        "/int/ui/*", "/int/rest/*", "/int/logout", "/int/login/*", "/int/authz/request"
+      "/git/*", "/logout", "/rest/*", "/ui/*", "/login/*",
+      "/int/ui/*", "/int/rest/*", "/int/logout", "/int/login/*", "/int/authz/request"
     },
     initParams = {
         @WebInitParam(name = "configFactory", value = "ca.bc.gov.gwa.servlet.authentication.oidc.OidcConfigFactory"),
@@ -33,6 +35,7 @@ public class OidcSecurityFilter extends SecurityFilter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         final String servletPath = ((HttpServletRequest) request).getServletPath();
 
+        log.info("Security Filter " + servletPath);
         final HttpSession session = ((HttpServletRequest)request).getSession(false);
 //        if (session == null) {
 //            HttpServletResponse resp = ((HttpServletResponse)response);

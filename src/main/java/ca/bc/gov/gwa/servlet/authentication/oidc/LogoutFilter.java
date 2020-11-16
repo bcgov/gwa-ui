@@ -25,7 +25,7 @@ import org.pac4j.core.exception.http.HttpAction;
 import org.pac4j.core.util.Pac4jConstants;
 
 @WebFilter(urlPatterns = {
-  "/logout", "/int/logout"
+  "/int/logout", "/logout"
 })
 public class LogoutFilter extends AbstractConfigFilter {
 

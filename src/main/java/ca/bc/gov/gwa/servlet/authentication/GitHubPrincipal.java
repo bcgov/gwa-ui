@@ -45,6 +45,7 @@ public class GitHubPrincipal extends BasePrincipal {
     final Set<String> roles) {
     super(id, name, roles);
     this.login = login;
+    throw new IllegalArgumentException("GitHubPrincipal no longer supported!");
   }
 
   public void addDeveloperRole() {

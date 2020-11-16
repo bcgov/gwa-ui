@@ -19,6 +19,9 @@ import {NewNamespaceDialogComponent} from './new-dialog';
             <mat-card>
                 <mat-card-title>Namespaces</mat-card-title>
                 <mat-card-content>
+                    <mat-card *ngIf="success" style="margin-bottom:10px">
+                        Namespace created.  <a href="logout">Logout</a> to select your new namespace.
+                    </mat-card>
                     <mat-toolbar>
                         <button (click)="newNamespace()" mat-raised-button color="primary">Create Namespace</button>
                     </mat-toolbar>
@@ -37,6 +40,8 @@ export class NamespaceViewComponent extends BaseDetailComponent<any> implements 
   serverDataSource = new MatTableDataSource<any>();
 
   response: string;
+
+  success: boolean;
 
   constructor(
     injector: Injector,
@@ -68,6 +73,8 @@ export class NamespaceViewComponent extends BaseDetailComponent<any> implements 
             ).subscribe(
                 response => {
                   this.response = response;
+                  this.success = response ? true:false;
+                  console.log(response)
                 }
             );
         }

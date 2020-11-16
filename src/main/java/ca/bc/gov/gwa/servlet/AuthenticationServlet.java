@@ -49,6 +49,10 @@ public class AuthenticationServlet extends BaseServlet {
       
       data.put("roles", roles);
       
+      Map<String, Object> config = new HashMap<>();
+      config.put("grafanaBaseUrl", this.apiService.getGrafanaUrl());
+      data.put("config", config);
+      
     } else {
       data = Collections.emptyMap();
     }

@@ -43,6 +43,9 @@ export class EndpointViewComponent extends BaseDetailComponent<Api> implements O
         if (api) {
           this.setTitle(`Endpoint: ${api.name} - Gateway Admin`);
           this.endpoint = api.plugin('bcgov-gwa-endpoint');
+          if (!this.endpoint) {
+              this.endpoint = new Plugin('bcgov-gwa-endpoint', {})
+          }
           this.acl = api.plugin('acl');
           this.keyAuth = api.plugin('key-auth');
           let rateLimit = api.plugin('rate-limiting');
