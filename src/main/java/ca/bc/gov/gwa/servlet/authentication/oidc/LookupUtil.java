@@ -59,7 +59,6 @@ public class LookupUtil {
                     System.out.println("Refresh worked! Saving in session the updated token");
                     profileManager.save(true, profile.get(), false);
                 } else {
-                    System.out.println("Not able to renew");
                     request.getSession().invalidate();
                 }
 
