@@ -22,8 +22,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import javax.servlet.annotation.WebFilter;
 
-@WebFilter(urlPatterns = {
-})
+//@WebFilter(urlPatterns = {
+//})
 public class ForceLoginFilter extends AbstractConfigFilter {
 
     @Override

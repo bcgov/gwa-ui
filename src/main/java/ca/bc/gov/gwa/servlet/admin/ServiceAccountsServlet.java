@@ -129,13 +129,14 @@ public class ServiceAccountsServlet extends BaseNSAdminServlet {
     final HttpServletResponse response) throws IOException {
     final Map<String, Object> kongResponse;
 
-    CommonProfile profile = LookupUtil.lookupUserProfile(request, response);
-    
-    String ns = LookupUtil.getNamespaceClaim(profile);
-    
-    GwaController cc = ApiService.getGwaController(request.getServletContext());
 
     try {
+        CommonProfile profile = LookupUtil.lookupUserProfile(request, response);
+
+        String ns = LookupUtil.getNamespaceClaim(profile);
+
+        GwaController cc = ApiService.getGwaController(request.getServletContext());
+        
         List<String> result = cc.getGwaApiService().getServiceAccountList(profile, ns);
         
         List<Map<String,Object>> data = new ArrayList<>();
