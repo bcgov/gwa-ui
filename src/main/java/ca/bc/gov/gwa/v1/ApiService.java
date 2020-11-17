@@ -26,6 +26,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.security.Principal;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -57,17 +59,21 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.logging.Level;
+import java.util.stream.Collectors;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.conn.HttpHostConnectException;
 import org.pac4j.core.profile.UserProfile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Slf4j
 @WebListener
 public class ApiService implements ServletContextListener, GwaConstants {
 
@@ -134,6 +140,8 @@ public class ApiService implements ServletContextListener, GwaConstants {
     private String kongAdminUsername = null;
     
     private String grafanaUrl = null;
+    
+    private String openapiConsoleUrl = null;
 
     private final Map<String, Map<String, Map<String, Object>>> objectByTypeAndId = new HashMap<>();
 
@@ -544,6 +552,7 @@ public class ApiService implements ServletContextListener, GwaConstants {
             this.apiKeyExpiryDays = Integer.parseInt(getConfig("gwaApiKeyExpiryDays", "90"));
             this.useEndpoints = !"false".equals(getConfig("gwaUseEndpoints", "true"));
             this.grafanaUrl = getConfig("grafanaUrl");
+            this.openapiConsoleUrl = getConfig("openapiConsoleUrl");
 
             if (this.gitHubClientId == null || this.gitHubClientSecret == null) {
                 LoggerFactory.getLogger(getClass())
@@ -723,7 +732,25 @@ public class ApiService implements ServletContextListener, GwaConstants {
         for (Route r : svc.getRoutes()) {
             hosts.addAll(r.getHosts());
         }
-        maskedServiceDetail.put("hosts", hosts);
+        maskedServiceDetail.put("hosts", hosts.stream().distinct().collect(Collectors.toList()));
+
+        if (svc.hasPlugin("kong-spec-expose")) {
+            String svcHost = (String) svc.getData().get("host");
+            if (svc.getRoutes().size() > 0) {
+                Route route = svc.getRoutes().get(0);
+                if (route.getHosts().size() > 0) {
+                    String openApiUrl = route.getHosts().get(0);
+
+                    String url = (String) svc.getPlugin("kong-spec-expose").get().getConfig().get("spec_url");
+                    try {
+                        String path = new URL(url).getPath();
+                        maskedServiceDetail.put("openapi", String.format("%s?url=https://%s%s", openapiConsoleUrl, openApiUrl, path));
+                    } catch (MalformedURLException ex) {
+                        log.error("Unable to get kong-spec-expose", ex);
+                    }
+                }
+            }
+        }
         return maskedServiceDetail;
     }
     

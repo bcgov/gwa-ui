@@ -6,9 +6,14 @@
     <mat-accordion>
 	    <mat-expansion-panel *ngFor="let api of apis">
 	      <mat-expansion-panel-header>
-	        <mat-panel-title>{{api.name}}</mat-panel-title>
-	        <mat-panel-description *ngIf="apiUrl(api)"><a [href]="apiUrl(api)">{{apiUrl(api)}}</a></mat-panel-description>
-  	    </mat-expansion-panel-header>
+	        <mat-panel-title>{{api.name}}
+            </mat-panel-title>
+            <mat-panel-description *ngIf="api.openapi">
+                <a target="_blank" href="{{api.openapi}}" onClick="event.stopPropagation()">OpenApi Console</a>
+            </mat-panel-description>
+            <mat-panel-description *ngIf="!api.openapi && apiUrl(api)"><a [href]="apiUrl(api)" target="_blank" onClick="event.stopPropagation()">{{apiUrl(api)}}</a>
+            </mat-panel-description>
+  	      </mat-expansion-panel-header>
   	    <ng-template matExpansionPanelContent>
   	      <h4>Rate Limits</h4>
   	      <table mat-table [dataSource]="rateLimit(api)" *ngIf="rateLimit(api).data.length; else noLimits">

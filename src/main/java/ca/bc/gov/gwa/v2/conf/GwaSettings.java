@@ -62,6 +62,8 @@ public class GwaSettings {
     
     private String grafanaUrl;
     
+    private String openapiConsoleUrl;
+    
     private String gwaApiUrl;
 
     public Map<String, Object> getConfig() {
@@ -155,9 +157,12 @@ public class GwaSettings {
     public String getGrafanaUrl() {
         return grafanaUrl;
     }
+
+    public String getOpenapiConsoleUrl() {
+        return openapiConsoleUrl;
+    }
     
-    
-    
+   
     public GwaSettings() {
         try {
             readProperties();
@@ -188,6 +193,7 @@ public class GwaSettings {
             this.gwaApiUrl = getConfig("gwaApiUrl");
 
             this.grafanaUrl = getConfig("grafanaUrl");
+            this.openapiConsoleUrl = getConfig("openapiConsoleUrl");
             
             if (this.oidcClientId == null || this.oidcClientSecret == null) {
                 LoggerFactory.getLogger(getClass())

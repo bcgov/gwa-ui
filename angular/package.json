@@ -4,7 +4,7 @@
   "description": "Gateway Admin",
   "scripts": {
     "ng": "ng",
-    "start-devkey": "ng serve gwa-devkey --port 4015 --base-href=/ng/ --deploy-url=/ng/",
+    "start-devkey": "ng serve gwa-devkey --port 4015 --base-href=/ng/ --proxy-config=./proxy.json --deploy-url=/ng/",
     "start-admin": "ng serve gwa-admin --port 4016 --base-href=/ng/admin/ --proxy-config=./proxy.json --deploy-url=/ng/admin/",
     "build-prod-devkey": "ng build gwa-devkey --prod --build-optimizer --base-href / --output-path ../target/gwa-devkey/ --progress false",
     "build-prod-admin": "ng build gwa-admin --prod --build-optimizer --base-href /int/ --output-path ../target/gwa-admin/ --progress false"
