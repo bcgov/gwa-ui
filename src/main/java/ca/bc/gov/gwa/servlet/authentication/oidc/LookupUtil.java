@@ -58,6 +58,8 @@ public class LookupUtil {
                 if (profile.isPresent()) {
                     System.out.println("Refresh worked! Saving in session the updated token");
                     profileManager.save(true, profile.get(), false);
+                } else {
+                    request.getSession().invalidate();
                 }
 
                 //throw ForbiddenAction.INSTANCE;
