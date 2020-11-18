@@ -29,7 +29,7 @@ import org.pac4j.jee.filter.CallbackFilter;
         initParams = {
             @WebInitParam(name = "defaultUrl", value = "/"),
             @WebInitParam(name = "renewSession", value = "true"),
-            @WebInitParam(name = "multiProfile", value = "true")
+            @WebInitParam(name = "multiProfile", value = "false")
         }
 )
 public class OidcCallbackFilter extends CallbackFilter {

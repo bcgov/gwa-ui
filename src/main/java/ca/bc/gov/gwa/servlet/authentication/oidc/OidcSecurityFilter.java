@@ -43,6 +43,7 @@ public class OidcSecurityFilter extends SecurityFilter {
 //        }
         //if ("/logout".equals(servletPath)) {
         //} else {
+        
             super.doFilter(request, response, chain);
         //}
     }

@@ -20,8 +20,11 @@ import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpSession;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.context.JEEContext;
+import org.pac4j.core.context.WebContext;
 import org.pac4j.core.exception.TechnicalException;
 import org.pac4j.core.exception.http.HttpAction;
+import org.pac4j.core.profile.CommonProfile;
+import org.pac4j.core.profile.ProfileManager;
 import org.pac4j.core.util.Pac4jConstants;
 
 @WebFilter(urlPatterns = {
@@ -51,6 +54,10 @@ public class LogoutFilter extends AbstractConfigFilter {
             clientId = "KeycloakOidcClient";
         }
 
+        final WebContext webContext = new JEEContext(request, response);
+
+        ProfileManager<CommonProfile> profileManager = new ProfileManager(webContext);
+        Optional<CommonProfile> profile = profileManager.get(true);
         
         String targetUrl = request.getRequestURL().toString().replace("/logout", "");
         logger.debug(targetUrl);
@@ -60,7 +67,7 @@ public class LogoutFilter extends AbstractConfigFilter {
         final Client client = Config.INSTANCE.getClients().findClient(clientId).orElseThrow(() -> new TechnicalException("No client found"));
         HttpAction action;
         try {
-            Optional<HttpAction> optAction = client.getLogoutAction(context, LookupUtil.lookupUserProfile(request, response), targetUrl);
+            Optional<HttpAction> optAction = client.getLogoutAction(context, profile.isPresent() ? profile.get() : null, targetUrl);
                 //action = (HttpAction) client.getRedirectionAction(context).get();
                 if (optAction.isPresent()) {
                     action = optAction.get();

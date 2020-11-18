@@ -10,8 +10,11 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Optional;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONArray;
 import org.pac4j.core.client.Client;
@@ -45,7 +48,9 @@ public class LookupUtil {
             System.out.println("IsExpired? " + profile.get().isExpired());
             Date exp = profile.get().getAttribute("exp", Date.class);
             System.out.println("Exp = "+exp);
-            if (exp.before(new Date())) {
+            long dt = exp.getTime() - new Date().getTime();
+            System.out.println("Exp = "+dt);
+            if (dt < 298000) {
                 System.out.println("EXPIRED!");
                 String clientId = request.getParameter(Pac4jConstants.DEFAULT_CLIENT_NAME_PARAMETER);
                 if (clientId == null) {
@@ -54,28 +59,42 @@ public class LookupUtil {
                 final JEEContext context = new JEEContext(request, response);
                 final Client client = Config.INSTANCE.getClients().findClient(clientId).orElseThrow(() -> new TechnicalException("No client found"));
                 
-                profile = client.renewUserProfile(profile.get(), webContext);
-                if (profile.isPresent()) {
-                    System.out.println("Refresh worked! Saving in session the updated token");
-                    profileManager.save(true, profile.get(), false);
-                } else {
-                    request.getSession().invalidate();
+                try {
+                    profile = client.renewUserProfile(profile.get(), webContext);
+                    if (profile.isPresent()) {
+                        System.out.println("Refresh worked! Saving in session the updated token");
+                        profileManager.save(true, profile.get(), false);
+                    } else {
+                        request.getSession().invalidate();
+                    }
+                } catch (TechnicalException te) {
+                    log.error("Error renewing token", te);
+                    try {
+                        request.getSession().invalidate();
+                        profileManager.logout();
+                        response.sendError(403, "{\"error\":\"\"}");
+                    } catch (IOException ex) {
+                        Logger.getLogger(LookupUtil.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    throw new TokenInvalidException("");
                 }
-
                 //throw ForbiddenAction.INSTANCE;
                 //return null;
                 //return null;
 //
 //                throw UnauthorizedAction.INSTANCE;
             }
-            
-            return profile.get();
+            //throw new RuntimeException("Invalid Token");
+          return profile.get();
         } else {
             return null;
         }
     }
 
     static public boolean isNamespaceAdmin (CommonProfile profile) {
+        if (profile == null) {
+            return false;
+        }
         String groupMatch = String.format("/ns-admins/%s", getNamespaceClaim(profile));
         JSONArray groups = profile.getAttribute("groups", JSONArray.class);
         return groups.contains(groupMatch);

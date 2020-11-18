@@ -203,7 +203,7 @@ public class GwaSettings {
             throw new RuntimeException("Something is wrong with your configuration!", ex);
         }
     }
-
+ 
     private void readProperties() throws IOException {
         final String catalinaBase = System.getProperty("catalina.base");
         for (final String dir : Arrays.asList(catalinaBase, ".", "..", "/apps")) {
