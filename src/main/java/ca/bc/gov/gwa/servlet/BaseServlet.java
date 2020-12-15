@@ -4,7 +4,6 @@ import ca.bc.gov.gwa.servlet.authentication.oidc.LookupUtil;
 import static ca.bc.gov.gwa.servlet.authentication.oidc.LookupUtil.isNamespaceAdmin;
 import ca.bc.gov.gwa.servlet.authentication.oidc.TokenInvalidException;
 import ca.bc.gov.gwa.v1.ApiService;
-import static com.sun.corba.se.spi.presentation.rmi.StubAdapter.request;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.ArrayList;
