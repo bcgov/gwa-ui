@@ -77,6 +77,8 @@ import org.slf4j.LoggerFactory;
 @WebListener
 public class ApiService implements ServletContextListener, GwaConstants {
 
+    static final String[] AUTH_PLUGIN_SELECTION = new String[] { "key-auth", "oidc", "jwt-keycloak" };
+    
     static String API_SERVICE_NAME = ApiService.class.getName();
 
     public static final Logger LOG = LoggerFactory.getLogger(ApiService.class);
@@ -751,6 +753,24 @@ public class ApiService implements ServletContextListener, GwaConstants {
                 }
             }
         }
+        if (svc.hasPlugin("acl-auth")) {
+            maskedServiceDetail.put("acl", true);
+        } else {
+            maskedServiceDetail.put("acl", false);
+        }
+        maskedServiceDetail.put("auth", "none");
+
+        // We will assume there is only one auth method configured per service
+        for (String authMethod : AUTH_PLUGIN_SELECTION) {
+            if (svc.hasPlugin(authMethod)) {
+                maskedServiceDetail.put("auth", authMethod);
+            }
+        }
+        // OIDC Discovery URLs:
+        // oidc : discovery URL
+        // jwt-keycloak : well_known_template
+        // Perhaps strip out the "host" and "realm" and include it, or map it to a "user friendly one"
+        //
         return maskedServiceDetail;
     }
     
