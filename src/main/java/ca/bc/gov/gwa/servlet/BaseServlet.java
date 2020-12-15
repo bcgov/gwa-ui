@@ -71,15 +71,10 @@ public abstract class BaseServlet extends HttpServlet {
       final Class<?> clazz = getClass();
       final Logger logger = LoggerFactory.getLogger(clazz);
       logger.error("Token Invalid", e);
-        ///sendError (response, 403);
     } catch (final Exception e) {
       final Class<?> clazz = getClass();
       final Logger logger = LoggerFactory.getLogger(clazz);
       logger.error("Error handling request", e);
-    } catch (final Throwable e) {
-      final Class<?> clazz = getClass();
-      final Logger logger = LoggerFactory.getLogger(clazz);
-      logger.error("THROWABLE handling request", e);
     }
   }
 

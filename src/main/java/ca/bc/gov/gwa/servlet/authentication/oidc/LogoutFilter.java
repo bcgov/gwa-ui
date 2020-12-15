@@ -56,7 +56,7 @@ public class LogoutFilter extends AbstractConfigFilter {
 
         final WebContext webContext = new JEEContext(request, response);
 
-        ProfileManager<CommonProfile> profileManager = new ProfileManager(webContext);
+        ProfileManager<CommonProfile> profileManager = new ProfileManager<CommonProfile>(webContext);
         Optional<CommonProfile> profile = profileManager.get(true);
         
         String targetUrl = request.getRequestURL().toString().replace("/logout", "");
