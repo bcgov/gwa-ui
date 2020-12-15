@@ -1,27 +1,17 @@
 package ca.bc.gov.gwa.servlet;
 
-import ca.bc.gov.gwa.servlet.authentication.oidc.LookupUtil;
-import static ca.bc.gov.gwa.servlet.authentication.oidc.LookupUtil.isNamespaceAdmin;
 import ca.bc.gov.gwa.servlet.authentication.oidc.TokenInvalidException;
 import ca.bc.gov.gwa.v1.ApiService;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
-import java.util.Optional;
-
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.pac4j.core.context.JEEContext;
-import org.pac4j.core.context.WebContext;
-import org.pac4j.core.profile.CommonProfile;
-import org.pac4j.core.profile.ProfileManager;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
