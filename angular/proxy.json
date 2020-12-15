@@ -1,0 +1,17 @@
+{
+    "/int/*": {
+      "changeOrigin": false,
+      "cookieDomainRewrite": "localhost",
+      "target": "http://localhost:8080"
+    },
+    "/rest/*": {
+        "changeOrigin": false,
+        "cookieDomainRewrite": "localhost",
+        "target": "http://localhost:8080"
+    },
+    "/login/window": {
+        "changeOrigin": false,
+        "cookieDomainRewrite": "localhost",
+        "target": "http://localhost:8080"
+    }
+  }

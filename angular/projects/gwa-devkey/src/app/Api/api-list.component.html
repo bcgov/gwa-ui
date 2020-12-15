@@ -4,37 +4,53 @@
     <p>You have permission to access the following applications.</p>
     
     <mat-accordion>
-	    <mat-expansion-panel *ngFor="let api of apis">
-	      <mat-expansion-panel-header>
-	        <mat-panel-title>{{api.name}}
-            </mat-panel-title>
-            <mat-panel-description *ngIf="api.openapi">
-                <a target="_blank" href="{{api.openapi}}" onClick="event.stopPropagation()">OpenApi Console</a>
-            </mat-panel-description>
-            <mat-panel-description *ngIf="!api.openapi && apiUrl(api)"><a [href]="apiUrl(api)" target="_blank" onClick="event.stopPropagation()">{{apiUrl(api)}}</a>
-            </mat-panel-description>
-  	      </mat-expansion-panel-header>
-  	    <ng-template matExpansionPanelContent>
-  	      <h4>Rate Limits</h4>
-  	      <table mat-table [dataSource]="rateLimit(api)" *ngIf="rateLimit(api).data.length; else noLimits">
-					  <ng-container matColumnDef="period">
-					    <th mat-header-cell *matHeaderCellDef>Period</th>
-					    <td mat-cell *matCellDef="let record">{{record.period}}</td>
-					  </ng-container>
-					
-					  <ng-container matColumnDef="limit">
-					    <th mat-header-cell *matHeaderCellDef>Limit</th>
-					    <td mat-cell *matCellDef="let record">{{record.limit}}</td>
-					  </ng-container>
-					
-					  <tr mat-header-row *matHeaderRowDef="limitColumns"></tr>
-					  <tr mat-row *matRowDef="let row; columns: limitColumns"></tr>
-					</table>
-					<ng-template #noLimits><i>No rate limiting applied</i></ng-template>
-					
-  	    </ng-template> 
-	    </mat-expansion-panel>
-    
+        <mat-expansion-panel *ngFor="let api of apis">
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                    <span style="display:flex; justify-content: left; align-items: center; width: 20px" *ngIf="api.acl">
+                        ACL
+                    </span>
+                    <span style="display:flex; justify-content: left; align-items: center; width: 20px" *ngIf="!api.acl">
+                    </span>
+                    <span style="display:flex; justify-content: left; align-items: center; width: 100px" *ngIf="api.auth == 'none'">
+                        <span class="material-icons">
+                        public
+                        </span> public
+                    </span>
+                    <span style="display:flex; justify-content: left; align-items: center; width: 100px" *ngIf="api.auth != 'none'">
+                        <span class="material-icons">
+                        security
+                        </span>{{api.auth}}
+                    </span>
+                    {{api.name}}
+                </mat-panel-title>
+                <mat-panel-description *ngIf="api.openapi">
+                    <a target="_blank" href="{{api.openapi}}" onClick="event.stopPropagation()">OpenApi Console</a>
+                </mat-panel-description>
+                <mat-panel-description *ngIf="!api.openapi && apiUrl(api)"><a [href]="apiUrl(api)" target="_blank" onClick="event.stopPropagation()">{{apiUrl(api)}}</a>
+                </mat-panel-description>
+            </mat-expansion-panel-header>
+            <ng-template matExpansionPanelContent>
+                <h4>Rate Limits</h4>
+                <table mat-table [dataSource]="rateLimit(api)" *ngIf="rateLimit(api).data.length; else noLimits">
+                    <ng-container matColumnDef="period">
+                        <th mat-header-cell *matHeaderCellDef>Period</th>
+                        <td mat-cell *matCellDef="let record">{{record.period}}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="limit">
+                        <th mat-header-cell *matHeaderCellDef>Limit</th>
+                        <td mat-cell *matCellDef="let record">{{record.limit}}</td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="limitColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: limitColumns"></tr>
+                </table>
+                <ng-template #noLimits><i>No rate limiting applied</i></ng-template>
+
+            </ng-template> 
+        </mat-expansion-panel>
+
     </mat-accordion>
   </mat-card-content>
 </mat-card>

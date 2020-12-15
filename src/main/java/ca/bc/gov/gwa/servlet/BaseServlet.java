@@ -1,28 +1,18 @@
 package ca.bc.gov.gwa.servlet;
 
-import ca.bc.gov.gwa.servlet.authentication.oidc.LookupUtil;
-import static ca.bc.gov.gwa.servlet.authentication.oidc.LookupUtil.isNamespaceAdmin;
 import ca.bc.gov.gwa.servlet.authentication.oidc.TokenInvalidException;
 import ca.bc.gov.gwa.v1.ApiService;
-import static com.sun.corba.se.spi.presentation.rmi.StubAdapter.request;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
-
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.pac4j.core.context.JEEContext;
-import org.pac4j.core.context.WebContext;
-import org.pac4j.core.profile.CommonProfile;
-import org.pac4j.core.profile.ProfileManager;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,7 +72,6 @@ public abstract class BaseServlet extends HttpServlet {
       final Class<?> clazz = getClass();
       final Logger logger = LoggerFactory.getLogger(clazz);
       logger.error("Token Invalid", e);
-        ///sendError (response, 403);
     } catch (final Exception e) {
       final Class<?> clazz = getClass();
       final Logger logger = LoggerFactory.getLogger(clazz);

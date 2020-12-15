@@ -77,6 +77,8 @@ import org.slf4j.LoggerFactory;
 @WebListener
 public class ApiService implements ServletContextListener, GwaConstants {
 
+    static final String[] AUTH_PLUGIN_SELECTION = new String[] { "key-auth", "oidc", "jwt-keycloak" };
+    
     static String API_SERVICE_NAME = ApiService.class.getName();
 
     public static final Logger LOG = LoggerFactory.getLogger(ApiService.class);
@@ -735,23 +737,46 @@ public class ApiService implements ServletContextListener, GwaConstants {
         maskedServiceDetail.put("hosts", hosts.stream().distinct().collect(Collectors.toList()));
 
         if (svc.hasPlugin("kong-spec-expose")) {
-            String svcHost = (String) svc.getData().get("host");
-            if (svc.getRoutes().size() > 0) {
-                Route route = svc.getRoutes().get(0);
-                if (route.getHosts().size() > 0) {
-                    String openApiUrl = route.getHosts().get(0);
+            maskedServiceDetail.put("openapi", getExposeUrl (svc));
+        }
+        if (svc.hasPlugin("acl-auth")) {
+            maskedServiceDetail.put("acl", true);
+        } else {
+            maskedServiceDetail.put("acl", false);
+        }
+        maskedServiceDetail.put("auth", "none");
 
-                    String url = (String) svc.getPlugin("kong-spec-expose").get().getConfig().get("spec_url");
-                    try {
-                        String path = new URL(url).getPath();
-                        maskedServiceDetail.put("openapi", String.format("%s?url=https://%s%s", openapiConsoleUrl, openApiUrl, path));
-                    } catch (MalformedURLException ex) {
-                        log.error("Unable to get kong-spec-expose", ex);
-                    }
+        // We will assume there is only one auth method configured per service
+        for (String authMethod : AUTH_PLUGIN_SELECTION) {
+            if (svc.hasPlugin(authMethod)) {
+                maskedServiceDetail.put("auth", authMethod);
+            }
+        }
+        // OIDC Discovery URLs:
+        // oidc : discovery URL
+        // jwt-keycloak : well_known_template
+        // Perhaps strip out the "host" and "realm" and include it, or map it to a "user friendly one"
+        //
+        return maskedServiceDetail;
+    }
+    
+    private String getExposeUrl (Service svc) {
+        String svcHost = (String) svc.getData().get("host");
+        if (svc.getRoutes().size() > 0) {
+            Route route = svc.getRoutes().get(0);
+            if (route.getHosts().size() > 0) {
+                String openApiUrl = route.getHosts().get(0);
+
+                String url = (String) svc.getPlugin("kong-spec-expose").get().getConfig().get("spec_url");
+                try {
+                    String path = new URL(url).getPath();
+                    return String.format("%s?url=https://%s%s", openapiConsoleUrl, openApiUrl, path);
+                } catch (MalformedURLException ex) {
+                    log.error("Unable to get kong-spec-expose", ex);
                 }
             }
         }
-        return maskedServiceDetail;
+        return "";
     }
     
     @SuppressWarnings("unchecked")

@@ -25,8 +25,8 @@ public abstract class BaseNSAdminServlet extends BaseServlet {
 
     private boolean hasNamespaceAdminRole(final HttpServletRequest request, final HttpServletResponse response) {
         CommonProfile profile = LookupUtil.lookupUserProfile(request, response);
-
-        if (LookupUtil.isNamespaceAdmin(profile)) {
+        
+        if (profile != null && LookupUtil.isNamespaceAdmin(profile)) {
             return true;
         }
         sendError(response, HttpServletResponse.SC_FORBIDDEN);

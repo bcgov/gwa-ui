@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.pac4j.core.authorization.authorizer.Authorizer;
-import org.pac4j.core.authorization.checker.AuthorizationChecker;
 import org.pac4j.core.authorization.checker.DefaultAuthorizationChecker;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.config.Config;
@@ -23,9 +22,6 @@ import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.core.profile.ProfileManager;
 import org.pac4j.core.profile.UserProfile;
 
-/**
- *
- */
 public class CustomDefaultAuthorizationChecker extends DefaultAuthorizationChecker {
 
     @Override
