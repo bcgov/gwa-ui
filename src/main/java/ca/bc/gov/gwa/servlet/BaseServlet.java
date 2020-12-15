@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -75,6 +76,10 @@ public abstract class BaseServlet extends HttpServlet {
       final Class<?> clazz = getClass();
       final Logger logger = LoggerFactory.getLogger(clazz);
       logger.error("Error handling request", e);
+    } catch (final Throwable e) {
+      final Class<?> clazz = getClass();
+      final Logger logger = LoggerFactory.getLogger(clazz);
+      logger.error("THROWABLE handling request", e);
     }
   }
 
