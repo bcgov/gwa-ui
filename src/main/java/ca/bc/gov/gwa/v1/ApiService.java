@@ -78,6 +78,7 @@ import org.slf4j.LoggerFactory;
 public class ApiService implements ServletContextListener, GwaConstants {
 
     static final String[] AUTH_PLUGIN_SELECTION = new String[] { "key-auth", "oidc", "jwt-keycloak" };
+    static final String[] AUTH_PLUGIN_LABELS = new String[] { "API Key", "OIDC", "OIDC JWT" };
     
     static String API_SERVICE_NAME = ApiService.class.getName();
 
@@ -747,10 +748,12 @@ public class ApiService implements ServletContextListener, GwaConstants {
         maskedServiceDetail.put("auth", "none");
 
         // We will assume there is only one auth method configured per service
+        int index = 0;
         for (String authMethod : AUTH_PLUGIN_SELECTION) {
             if (svc.hasPlugin(authMethod)) {
-                maskedServiceDetail.put("auth", authMethod);
+                maskedServiceDetail.put("auth", AUTH_PLUGIN_LABELS[index]);
             }
+            index++;
         }
         // OIDC Discovery URLs:
         // oidc : discovery URL

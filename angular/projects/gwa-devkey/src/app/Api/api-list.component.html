@@ -7,14 +7,15 @@
         <mat-expansion-panel *ngFor="let api of apis">
             <mat-expansion-panel-header>
                 <mat-panel-title>
-                    <span style="display:flex; justify-content: left; align-items: center; width: 20px" *ngIf="api.acl">
+<!--                    <span style="display:flex; justify-content: left; align-items: center; width: 20px" *ngIf="api.acl">
                         ACL
                     </span>
                     <span style="display:flex; justify-content: left; align-items: center; width: 20px" *ngIf="!api.acl">
-                    </span>
+                    </span>-->
+                <span style="font-size: 90%; border-radius: 10px; background-color:#EFEFEF; padding:2px; margin-right: 5px;">
                     <span style="display:flex; justify-content: left; align-items: center; width: 100px" *ngIf="api.auth == 'none'">
                         <span class="material-icons">
-                        public
+                            public
                         </span> public
                     </span>
                     <span style="display:flex; justify-content: left; align-items: center; width: 100px" *ngIf="api.auth != 'none'">
@@ -22,6 +23,7 @@
                         security
                         </span>{{api.auth}}
                     </span>
+                </span>
                     {{api.name}}
                 </mat-panel-title>
                 <mat-panel-description *ngIf="api.openapi">
