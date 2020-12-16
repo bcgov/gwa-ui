@@ -81,10 +81,10 @@ public class LookupUtil {
 
         try {
             Optional<CommonProfile> newProfile = client.renewUserProfile(profile.get(), webContext);
-            if (profile.isPresent()) {
+            if (newProfile.isPresent()) {
                 log.debug("Refresh worked! Saving in session the updated token");
-                profileManager.save(true, profile.get(), false);
-                return profile.get();
+                profileManager.save(true, newProfile.get(), false);
+                return newProfile.get();
             } else {
                 log.error("Refresh failed, so invalidating session and returning a 403 error");
             }

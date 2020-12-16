@@ -1,5 +1,10 @@
 # Kong Api Gateway Administration
 
+<img src="https://github.com/bcgov/gwa-ui/workflows/Build/badge.svg"></img>
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=gwa-ui&metric=alert_status)](https://sonarcloud.io/dashboard?id=gwa-ui)
+[![img](https://img.shields.io/badge/Lifecycle-Dormant-ff7f2a)](https://github.com/bcgov/repomountie/blob/master/doc/lifecycle-badges.md)
+
+
 This project contains a web interface for managing the KONG Api Gateway.
 
 ## Installation
